@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+button[type="submit"] {
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+} 
