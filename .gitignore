@@ -1,0 +1,30 @@
+# Backend
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+backend/.settings/
+backend/.classpath
+backend/.project
+backend/.factorypath
+backend/HELP.md
+
+# Frontend
+frontend/node_modules/
+frontend/.angular/
+frontend/dist/
+frontend/.vscode/
+frontend/npm-debug.log
+frontend/yarn-error.log
+frontend/.env
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Misc
+.DS_Store
+Thumbs.db 
