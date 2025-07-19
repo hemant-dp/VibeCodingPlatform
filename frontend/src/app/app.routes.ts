@@ -2,7 +2,15 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./components/landing/landing.component').then(m => m.LandingComponent)
+  },
+  {
+    path: 'selection',
+    loadComponent: () => import('./components/selection/selection.component').then(m => m.SelectionComponent)
+  },
   {
     path: 'login',
     loadComponent: () => import('./components/auth/login/login.component').then(m => m.LoginComponent)
@@ -27,13 +35,13 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'profile',
-    loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
+    path: 'submissions',
+    loadComponent: () => import('./components/submission/submission-list/submission-list.component').then(m => m.SubmissionListComponent),
     canActivate: [authGuard]
   },
   {
-    path: 'submissions',
-    loadComponent: () => import('./components/submission/submission-list/submission-list.component').then(m => m.SubmissionListComponent),
+    path: 'profile',
+    loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
     canActivate: [authGuard]
   }
 ];

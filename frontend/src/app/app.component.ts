@@ -21,21 +21,75 @@ import { AuthService } from './services/auth.service';
   ],
   template: `
     <div class="min-h-screen flex flex-col">
-      <mat-toolbar color="primary" class="z-50">
-        <div class="container mx-auto flex justify-between items-center">
-          <div>
-            <a routerLink="/" class="text-white no-underline">
-              <span class="text-xl">VibeCoding Platform</span>
+      <!-- Navbar -->
+      <mat-toolbar class="bg-white border-b border-gray-200 px-4">
+        <div class="container mx-auto flex items-center justify-between h-16">
+          <!-- Left side: Logo and primary navigation -->
+          <div class="flex items-center space-x-8">
+            <!-- Logo -->
+            <a routerLink="/" class="flex items-center">
+              <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-8 w-auto">
             </a>
+
+            <!-- Primary Navigation -->
+            <nav class="hidden md:flex items-center space-x-1">
+              <a routerLink="/" 
+                 class="px-4 py-2 rounded-full text-white bg-[#0033A1] hover:bg-[#0033A1]/90 flex items-center">
+                <mat-icon class="mr-2">home</mat-icon>
+                Home
+              </a>
+              <a routerLink="/getting-started" 
+                 class="px-4 py-2 rounded-full text-gray-700 hover:bg-gray-100 flex items-center">
+                <mat-icon class="mr-2">rocket_launch</mat-icon>
+                Getting Started
+              </a>
+              <a routerLink="/resources" 
+                 class="px-4 py-2 rounded-full text-gray-700 hover:bg-gray-100 flex items-center">
+                <mat-icon class="mr-2">school</mat-icon>
+                Resources
+              </a>
+              <a routerLink="/dashboard" 
+                 class="px-4 py-2 rounded-full text-gray-700 hover:bg-gray-100 flex items-center">
+                <mat-icon class="mr-2">dashboard</mat-icon>
+                Dashboard
+              </a>
+              <a routerLink="/community" 
+                 class="px-4 py-2 rounded-full text-gray-700 hover:bg-gray-100 flex items-center">
+                <mat-icon class="mr-2">people</mat-icon>
+                Community
+              </a>
+            </nav>
           </div>
 
+          <!-- Right side: Help and User menu -->
           <div class="flex items-center space-x-4">
+            <!-- Help Menu -->
+            <button mat-button [matMenuTriggerFor]="helpMenu" 
+                    class="px-4 py-2 rounded-full text-gray-700 hover:bg-gray-100 flex items-center">
+              <mat-icon class="mr-2">help</mat-icon>
+              Help
+              <mat-icon class="ml-1">arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #helpMenu="matMenu">
+              <a mat-menu-item href="#">
+                <mat-icon>help_outline</mat-icon>
+                <span>Documentation</span>
+              </a>
+              <a mat-menu-item href="#">
+                <mat-icon>contact_support</mat-icon>
+                <span>Support</span>
+              </a>
+            </mat-menu>
+
+            <!-- User Menu -->
             @if (isAuthenticated()) {
-              <a mat-button routerLink="/problems">Problems</a>
-              <a mat-button routerLink="/submissions">Submissions</a>
-              <button mat-button [matMenuTriggerFor]="userMenu">
-                <mat-icon>account_circle</mat-icon>
+              <button mat-button [matMenuTriggerFor]="userMenu" 
+                      class="px-2 py-1 rounded-full bg-[#0033A1] text-white hover:bg-[#0033A1]/90 flex items-center">
+                <span class="w-8 h-8 rounded-full bg-white text-[#0033A1] flex items-center justify-center font-bold mr-2">
+                  {{ getUserInitial() }}
+                </span>
                 {{ getUserName() }}
+                <mat-icon class="ml-1">arrow_drop_down</mat-icon>
               </button>
               <mat-menu #userMenu="matMenu">
                 <a mat-menu-item routerLink="/profile">
@@ -48,57 +102,20 @@ import { AuthService } from './services/auth.service';
                 </button>
               </mat-menu>
             } @else {
-              <a mat-button routerLink="/login">Login</a>
-              <a mat-button routerLink="/register">Register</a>
+              <a mat-button routerLink="/login" 
+                 class="px-4 py-2 rounded-full text-gray-700 hover:bg-gray-100">
+                Login
+              </a>
+              <a mat-button routerLink="/register" 
+                 class="px-4 py-2 rounded-full bg-[#0033A1] text-white hover:bg-[#0033A1]/90">
+                Register
+              </a>
             }
           </div>
         </div>
       </mat-toolbar>
 
-      @if (!isAuthenticated() && isHomePage()) {
-        <!-- Landing Page -->
-        <div class="flex-grow bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 text-white">
-          <div class="container mx-auto px-4 py-16">
-            <div class="flex flex-col items-center text-center space-y-8">
-              <h1 class="text-5xl font-bold mb-4">Welcome to VibeCoding Platform</h1>
-              <p class="text-xl mb-8 max-w-2xl">
-                Master your coding skills with our comprehensive platform. Practice problems, 
-                track your progress, and join a community of developers.
-              </p>
-              
-              <!-- Trophy Button -->
-              <a routerLink="/login" class="transform hover:scale-110 transition-transform duration-300 cursor-pointer">
-                <div class="bg-yellow-400 rounded-full p-8 shadow-lg hover:shadow-xl">
-                  <mat-icon class="text-6xl w-16 h-16 text-blue-900">emoji_events</mat-icon>
-                </div>
-                <p class="mt-4 text-lg font-semibold">Start Your Coding Journey</p>
-              </a>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-                <div class="p-6 bg-white bg-opacity-10 rounded-lg">
-                  <mat-icon class="text-4xl text-yellow-400">code</mat-icon>
-                  <h3 class="text-xl font-semibold mt-4">Practice Problems</h3>
-                  <p class="mt-2">Solve diverse coding challenges across different difficulty levels</p>
-                </div>
-                <div class="p-6 bg-white bg-opacity-10 rounded-lg">
-                  <mat-icon class="text-4xl text-yellow-400">trending_up</mat-icon>
-                  <h3 class="text-xl font-semibold mt-4">Track Progress</h3>
-                  <p class="mt-2">Monitor your improvement with detailed performance analytics</p>
-                </div>
-                <div class="p-6 bg-white bg-opacity-10 rounded-lg">
-                  <mat-icon class="text-4xl text-yellow-400">group</mat-icon>
-                  <h3 class="text-xl font-semibold mt-4">Join Community</h3>
-                  <p class="mt-2">Connect with fellow developers and share your solutions</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      } @else {
-        <div class="container mx-auto p-4">
-          <router-outlet></router-outlet>
-        </div>
-      }
+      <router-outlet></router-outlet>
     </div>
   `,
   styles: [`
@@ -110,22 +127,12 @@ import { AuthService } from './services/auth.service';
       position: sticky;
       top: 0;
       z-index: 1000;
+      height: auto;
+      padding: 0.5rem 0;
     }
-    .text-6xl {
-      font-size: 3.75rem;
-      line-height: 1;
-    }
-    mat-icon.text-4xl {
-      transform: scale(1.5);
+    .mat-mdc-button {
       height: 40px;
-      width: 40px;
-      font-size: 40px;
-    }
-    mat-icon.text-6xl {
-      transform: scale(2);
-      height: 48px;
-      width: 48px;
-      font-size: 48px;
+      border-radius: 20px;
     }
   `]
 })
@@ -149,12 +156,13 @@ export class AppComponent implements OnInit {
     return userInfo?.username || 'User';
   }
 
+  getUserInitial(): string {
+    const name = this.getUserName();
+    return name.charAt(0).toUpperCase();
+  }
+
   onLogout(): void {
     console.log('Logging out...');
     this.authService.logout();
-  }
-
-  isHomePage(): boolean {
-    return window.location.pathname === '/';
   }
 }
