@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -17,61 +16,82 @@ import { AuthService } from './services/auth.service';
     RouterLink,
     MatToolbarModule,
     MatButtonModule,
-    MatSidenavModule,
-    MatListModule,
-    MatIconModule
+    MatIconModule,
+    MatMenuModule
   ],
   template: `
-    <mat-toolbar color="primary">
-      <button mat-icon-button (click)="sidenav.toggle()">
-        <mat-icon>menu</mat-icon>
-      </button>
-      <span>Vibe Coding Platform</span>
-      <span class="spacer"></span>
-      @if (!isAuthenticated()) {
-        <button mat-button routerLink="/login">Login</button>
-        <button mat-button routerLink="/register">Register</button>
-      } @else {
-        <button mat-button (click)="logout()">Logout</button>
-      }
+    <mat-toolbar color="primary" class="flex justify-between">
+      <div>
+        <a routerLink="/" class="text-white no-underline">
+          <span class="text-xl">VibeCoding Platform</span>
+        </a>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        @if (isAuthenticated()) {
+          <a mat-button routerLink="/problems">Problems</a>
+          <a mat-button routerLink="/submissions">Submissions</a>
+          <button mat-button [matMenuTriggerFor]="userMenu">
+            <mat-icon>account_circle</mat-icon>
+            {{ getUserName() }}
+          </button>
+          <mat-menu #userMenu="matMenu">
+            <a mat-menu-item routerLink="/profile">
+              <mat-icon>person</mat-icon>
+              <span>Profile</span>
+            </a>
+            <button mat-menu-item (click)="onLogout()">
+              <mat-icon>exit_to_app</mat-icon>
+              <span>Logout</span>
+            </button>
+          </mat-menu>
+        } @else {
+          <a mat-button routerLink="/login">Login</a>
+          <a mat-button routerLink="/register">Register</a>
+        }
+      </div>
     </mat-toolbar>
 
-    <mat-sidenav-container>
-      <mat-sidenav #sidenav mode="side">
-        <mat-nav-list>
-          <a mat-list-item routerLink="/dashboard">Dashboard</a>
-          <a mat-list-item routerLink="/problems">Problems</a>
-          @if (isAuthenticated()) {
-            <a mat-list-item routerLink="/profile">Profile</a>
-          }
-        </mat-nav-list>
-      </mat-sidenav>
-
-      <mat-sidenav-content>
-        <router-outlet></router-outlet>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+    <div class="container mx-auto p-4">
+      <router-outlet></router-outlet>
+    </div>
   `,
   styles: [`
-    .spacer {
-      flex: 1 1 auto;
+    :host {
+      display: block;
+      min-height: 100vh;
     }
-    mat-sidenav-container {
-      height: calc(100vh - 64px);
-    }
-    mat-sidenav {
-      width: 200px;
+    .mat-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
   `]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(private authService: AuthService) {}
+
+  ngOnInit() {
+    // Subscribe to auth status changes if needed
+    this.authService.getAuthStatus().subscribe(
+      isAuthenticated => {
+        // Handle authentication status changes if needed
+        console.log('Auth status changed:', isAuthenticated);
+      }
+    );
+  }
 
   isAuthenticated(): boolean {
     return this.authService.isAuthenticated();
   }
 
-  logout(): void {
+  getUserName(): string {
+    const userInfo = this.authService.getUserInfo();
+    return userInfo?.username || 'User';
+  }
+
+  onLogout(): void {
+    console.log('Logging out...');
     this.authService.logout();
   }
 }
