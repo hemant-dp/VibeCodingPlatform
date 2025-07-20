@@ -7,6 +7,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { RouterModule } from '@angular/router';
 import { ProblemService, Problem } from '../../services/problem.service';
 import { SubmissionService, Submission } from '../../services/submission.service';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,8 +35,20 @@ import { SubmissionService, Submission } from '../../services/submission.service
                 @for (problem of recentProblems; track problem.id) {
                   <div class="p-2 border rounded hover:bg-gray-50">
                     <a [routerLink]="['/problems', problem.id]" class="flex justify-between items-center">
-                      <span>{{ problem.title }}</span>
-                      <mat-chip [color]="getDifficultyColor(problem.difficulty)">
+                      <div class="flex flex-col">
+                        <span class="font-medium">{{ problem.title }}</span>
+                        @if (problem.tags?.length || 0 > 0) {
+                          <div class="flex gap-1 mt-1">
+                            @for (tag of problem.tags.slice(0, 2); track tag) {
+                              <span class="text-xs bg-gray-100 px-2 py-0.5 rounded">{{ tag }}</span>
+                            }
+                            @if (problem.tags.length > 2) {
+                              <span class="text-xs text-gray-500">+{{ problem.tags.length - 2 }}</span>
+                            }
+                          </div>
+                        }
+                      </div>
+                      <mat-chip [ngClass]="getDifficultyClass(problem.difficulty)">
                         {{ problem.difficulty }}
                       </mat-chip>
                     </a>
@@ -42,7 +56,10 @@ import { SubmissionService, Submission } from '../../services/submission.service
                 }
               </div>
             } @else {
-              <p>No recent problems available.</p>
+              <div class="text-center py-8 text-gray-500">
+                <mat-icon class="text-4xl mb-2">assignment</mat-icon>
+                <p>No recent problems available.</p>
+              </div>
             }
           </mat-card-content>
           <mat-card-actions>
@@ -61,19 +78,24 @@ import { SubmissionService, Submission } from '../../services/submission.service
                 @for (submission of recentSubmissions; track submission.id) {
                   <div class="p-2 border rounded hover:bg-gray-50">
                     <div class="flex justify-between items-center">
-                      <span>{{ submission.problem?.title }}</span>
-                      <mat-chip [color]="getStatusColor(submission.status)">
+                      <div class="flex flex-col">
+                        <span class="font-medium">{{ submission.problem?.title }}</span>
+                        <span class="text-sm text-gray-500">
+                          {{ submission.submittedAt | date:'MMM d, y, h:mm a' }}
+                        </span>
+                      </div>
+                      <mat-chip [ngClass]="getStatusClass(submission.status)">
                         {{ submission.status }}
                       </mat-chip>
-                    </div>
-                    <div class="text-sm text-gray-500">
-                      {{ submission.submittedAt | date:'short' }}
                     </div>
                   </div>
                 }
               </div>
             } @else {
-              <p>No recent submissions available.</p>
+              <div class="text-center py-8 text-gray-500">
+                <mat-icon class="text-4xl mb-2">code</mat-icon>
+                <p>No recent submissions available.</p>
+              </div>
             }
           </mat-card-content>
           <mat-card-actions>
@@ -93,6 +115,18 @@ import { SubmissionService, Submission } from '../../services/submission.service
     mat-card {
       margin-bottom: 1rem;
     }
+    .mat-mdc-card-header {
+      padding: 16px;
+    }
+    .mat-mdc-card-content {
+      padding: 0 16px;
+      min-height: 300px;
+    }
+    .mat-mdc-card-actions {
+      padding: 16px;
+      display: flex;
+      justify-content: flex-end;
+    }
   `]
 })
 export class DashboardComponent implements OnInit {
@@ -110,53 +144,58 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadRecentProblems(): void {
-    this.problemService.getRecentProblems(5).subscribe({
-      next: (problems) => {
-        this.recentProblems = problems;
-      },
-      error: (error) => {
+    this.problemService.getRecentProblems(5).pipe(
+      catchError(error => {
         console.error('Error loading recent problems:', error);
-      }
+        return of([]);
+      })
+    ).subscribe(problems => {
+      this.recentProblems = problems;
     });
   }
 
   private loadRecentSubmissions(): void {
-    this.submissionService.getRecentSubmissions(5).subscribe({
-      next: (submissions) => {
-        this.recentSubmissions = submissions;
-      },
-      error: (error) => {
+    this.submissionService.getRecentSubmissions(5).pipe(
+      catchError(error => {
         console.error('Error loading recent submissions:', error);
-      }
+        return of([]);
+      })
+    ).subscribe(submissions => {
+      this.recentSubmissions = submissions;
     });
   }
 
-  getDifficultyColor(difficulty: string): string {
+  getDifficultyClass(difficulty: string): string {
+    const baseClasses = 'text-sm font-medium';
     switch (difficulty) {
       case 'EASY':
-        return 'success';
+        return `${baseClasses} bg-green-100 text-green-800`;
       case 'MEDIUM':
-        return 'warning';
+        return `${baseClasses} bg-yellow-100 text-yellow-800`;
       case 'HARD':
-        return 'error';
+        return `${baseClasses} bg-red-100 text-red-800`;
       default:
-        return 'primary';
+        return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   }
 
-  getStatusColor(status: string): string {
+  getStatusClass(status: string): string {
+    const baseClasses = 'text-sm font-medium';
     switch (status) {
       case 'ACCEPTED':
-        return 'success';
+        return `${baseClasses} bg-green-100 text-green-800`;
       case 'WRONG_ANSWER':
       case 'COMPILATION_ERROR':
       case 'RUNTIME_ERROR':
-        return 'error';
+        return `${baseClasses} bg-red-100 text-red-800`;
       case 'TIME_LIMIT_EXCEEDED':
       case 'MEMORY_LIMIT_EXCEEDED':
-        return 'warning';
+        return `${baseClasses} bg-yellow-100 text-yellow-800`;
+      case 'PENDING':
+      case 'RUNNING':
+        return `${baseClasses} bg-blue-100 text-blue-800`;
       default:
-        return 'primary';
+        return `${baseClasses} bg-gray-100 text-gray-800`;
     }
   }
 } 

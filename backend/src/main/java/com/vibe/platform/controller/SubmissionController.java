@@ -1,14 +1,13 @@
 package com.vibe.platform.controller;
 
-import com.vibe.platform.model.Submission;
+import com.vibe.platform.dto.submission.SubmissionRequest;
+import com.vibe.platform.dto.submission.SubmissionResponse;
 import com.vibe.platform.model.User;
-import com.vibe.platform.repository.ProblemRepository;
-import com.vibe.platform.repository.SubmissionRepository;
-import com.vibe.platform.service.JudgeService;
+import com.vibe.platform.service.SubmissionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -16,94 +15,45 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/submissions")
-@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api/submissions")
+@Tag(name = "Submission Controller", description = "APIs for managing code submissions")
 public class SubmissionController {
 
     @Autowired
-    private SubmissionRepository submissionRepository;
-
-    @Autowired
-    private ProblemRepository problemRepository;
-
-    @Autowired
-    private JudgeService judgeService;
+    private SubmissionService submissionService;
 
     @GetMapping
-    public List<Submission> getSubmissions(@RequestParam(required = false) Long problemId) {
-        if (problemId != null) {
-            return submissionRepository.findByProblemId(problemId);
-        }
-        return submissionRepository.findAll();
+    @Operation(summary = "Get all submissions", description = "Retrieves all submissions, optionally filtered by problem ID")
+    public ResponseEntity<List<SubmissionResponse>> getSubmissions(
+            @RequestParam(required = false) Long problemId) {
+        return ResponseEntity.ok(submissionService.getAllSubmissions(problemId));
     }
 
     @GetMapping("/recent")
-    public List<Submission> getRecentSubmissions(@RequestParam(defaultValue = "5") int limit) {
-        return submissionRepository.findAll(
-            PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "submittedAt"))
-        ).getContent();
+    @Operation(summary = "Get recent submissions", description = "Retrieves the most recent submissions")
+    public ResponseEntity<List<SubmissionResponse>> getRecentSubmissions(
+            @RequestParam(defaultValue = "5") int limit) {
+        return ResponseEntity.ok(submissionService.getRecentSubmissions(limit));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Submission> getSubmission(@PathVariable Long id) {
-        return submissionRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Get submission by ID", description = "Retrieves a specific submission by its ID")
+    public ResponseEntity<SubmissionResponse> getSubmission(@PathVariable Long id) {
+        return ResponseEntity.ok(submissionService.getSubmission(id));
     }
 
     @GetMapping("/my-submissions")
-    public List<Submission> getUserSubmissions(@AuthenticationPrincipal User user) {
-        return submissionRepository.findByUserId(user.getId());
+    @Operation(summary = "Get user submissions", description = "Retrieves all submissions for the authenticated user")
+    public ResponseEntity<List<SubmissionResponse>> getUserSubmissions(
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(submissionService.getUserSubmissions(user));
     }
 
     @PostMapping
-    public ResponseEntity<Submission> submit(
+    @Operation(summary = "Submit code", description = "Submits code for a problem and initiates judging")
+    public ResponseEntity<SubmissionResponse> submit(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody SubmissionRequest request) {
-        return problemRepository.findById(request.getProblemId())
-                .map(problem -> {
-                    Submission submission = Submission.builder()
-                            .problem(problem)
-                            .user(user)
-                            .code(request.getCode())
-                            .language(request.getLanguage())
-                            .status(Submission.Status.PENDING)
-                            .build();
-
-                    submission = submissionRepository.save(submission);
-                    judgeService.judge(submission);
-                    return ResponseEntity.ok(submission);
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    public static class SubmissionRequest {
-        private Long problemId;
-        private String code;
-        private Submission.Language language;
-
-        public Long getProblemId() {
-            return problemId;
-        }
-
-        public void setProblemId(Long problemId) {
-            this.problemId = problemId;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-
-        public Submission.Language getLanguage() {
-            return language;
-        }
-
-        public void setLanguage(Submission.Language language) {
-            this.language = language;
-        }
+        return ResponseEntity.ok(submissionService.submit(user, request));
     }
 } 

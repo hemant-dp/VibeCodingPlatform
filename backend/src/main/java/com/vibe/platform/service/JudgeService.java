@@ -37,6 +37,7 @@ public class JudgeService {
         try {
             // Simulate compilation
             submission.setStatus(Submission.Status.COMPILING);
+            
             submissionRepository.save(submission);
             Thread.sleep(random.nextInt(1000)); // Simulate compilation time
 

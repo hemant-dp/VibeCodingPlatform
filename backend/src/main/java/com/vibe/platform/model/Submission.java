@@ -1,20 +1,20 @@
 package com.vibe.platform.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Data
+@Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity
 @Table(name = "submissions")
 public class Submission {
     @Id
@@ -22,15 +22,14 @@ public class Submission {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_id", nullable = false)
     private Problem problem;
 
-    @NotBlank
-    @Column(columnDefinition = "TEXT")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String code;
 
     @Enumerated(EnumType.STRING)
@@ -52,23 +51,25 @@ public class Submission {
     private String compileOutput;
 
     @CreationTimestamp
-    private ZonedDateTime submittedAt;
+    private LocalDateTime submittedAt;
 
     public enum Language {
         JAVA,
         PYTHON,
-        CPP
+        CPP,
+        JAVASCRIPT
     }
 
     public enum Status {
         PENDING,
-        COMPILING,
         RUNNING,
         ACCEPTED,
         WRONG_ANSWER,
         TIME_LIMIT_EXCEEDED,
         MEMORY_LIMIT_EXCEEDED,
+        RUNTIME_ERROR,
         COMPILATION_ERROR,
-        RUNTIME_ERROR
+        JUDGE_ERROR,
+        COMPILING
     }
 } 
