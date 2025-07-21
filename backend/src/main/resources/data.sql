@@ -1,8 +1,3 @@
--- Insert admin user if not exists
-INSERT INTO users (username, email, password_hash, role)
-SELECT 'admin', 'admin@cognizant.com', '$2a$10$KHR.CfkJe1WBPrPYpMXXBeXyEzQGQJ9qY1XgBVk8bvZXvgq3dFTVi', 'ADMIN'
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
-
 -- Insert sample problems
 INSERT INTO problems (title, description, constraints, difficulty, tags, input_format, output_format, created_by)
 VALUES 
@@ -53,4 +48,13 @@ VALUES
 -- Test cases for Binary Tree Maximum Path Sum
 (3, '5\n1 2 3 null null', '6', true),
 (3, '5\n-10 9 20 null null 15 7', '42', true),
-(3, '3\n2 -1 -2', '2', false); 
+(3, '3\n2 -1 -2', '2', false);
+
+-- Insert sample submissions
+INSERT INTO submissions (user_id, problem_id, code, language, status, execution_time_ms, memory_used_kb, submitted_at)
+VALUES
+(2, 1, 'class Solution { public int[] twoSum(int[] nums, int target) { } }', 'JAVA', 'ACCEPTED', 5, 1024, NOW()),
+(2, 2, 'def maxSubArray(nums): pass', 'PYTHON', 'WRONG_ANSWER', 10, 2048, NOW() - INTERVAL 1 DAY),
+(2, 3, 'public class Solution { }', 'JAVA', 'COMPILATION_ERROR', NULL, NULL, NOW() - INTERVAL 2 DAY),
+(2, 1, 'function twoSum(nums, target) { }', 'JAVASCRIPT', 'RUNTIME_ERROR', 15, 3072, NOW() - INTERVAL 3 DAY),
+(2, 2, 'int maxSubArray(vector<int>& nums) { }', 'CPP', 'TIME_LIMIT_EXCEEDED', 2000, 4096, NOW() - INTERVAL 4 DAY); 

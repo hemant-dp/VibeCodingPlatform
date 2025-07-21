@@ -6,9 +6,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ProblemService, Problem as ServiceProblem } from '../../../services/problem.service';
+import { ProblemService } from '../../../services/problem.service';
 
-interface Problem extends ServiceProblem {
+interface Problem {
+  id: number;
+  title: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  tags: string[];
   acceptanceRate: number;
   solved: boolean;
 }

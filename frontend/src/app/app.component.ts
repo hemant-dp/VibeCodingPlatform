@@ -8,6 +8,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
+import { User } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -76,14 +77,14 @@ import { filter } from 'rxjs/operators';
                       <div class="user-avatar-circle">
                         {{ getUserInitial() }}
                       </div>
-                      <span class="text-[#666666] ml-1 mr-1" [innerHTML]="'m&#64;1'"></span>
+                      <span class="text-[#666666] ml-1 mr-1">{{ currentUser?.username }}</span>
                       <mat-icon class="text-[#666666] transform scale-75">arrow_drop_down</mat-icon>
                     </div>
                   </button>
                   <mat-menu #userMenu="matMenu" class="mt-2">
                     <div class="py-1">
                       <div class="px-4 py-2 border-b border-gray-200">
-                        <div class="font-medium text-gray-900" [innerHTML]="'m&#64;1'"></div>
+                        <div class="font-medium text-gray-900">{{ currentUser?.username }}</div>
                       </div>
                       <a mat-menu-item routerLink="/profile" class="menu-item">
                         <mat-icon class="menu-icon">person</mat-icon>
@@ -275,6 +276,7 @@ import { filter } from 'rxjs/operators';
 export class AppComponent implements OnInit {
   isLandingPage = false;
   isScrolled = false;
+  currentUser: User | null = null;
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -293,11 +295,9 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.getAuthStatus().subscribe(
-      isAuthenticated => {
-        console.log('Auth status changed:', isAuthenticated);
-      }
-    );
+    this.authService.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+    });
   }
 
   isAuthenticated(): boolean {
@@ -305,7 +305,12 @@ export class AppComponent implements OnInit {
   }
 
   getUserInitial(): string {
-    return 'M';
+    if (!this.currentUser?.fullName) return '';
+    return this.currentUser.fullName
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
   }
 
   onLogout(): void {

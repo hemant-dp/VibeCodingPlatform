@@ -37,7 +37,7 @@ import { of } from 'rxjs';
                     <a [routerLink]="['/problems', problem.id]" class="flex justify-between items-center">
                       <div class="flex flex-col">
                         <span class="font-medium">{{ problem.title }}</span>
-                        @if (problem.tags?.length || 0 > 0) {
+                        @if (problem.tags && problem.tags.length > 0) {
                           <div class="flex gap-1 mt-1">
                             @for (tag of problem.tags.slice(0, 2); track tag) {
                               <span class="text-xs bg-gray-100 px-2 py-0.5 rounded">{{ tag }}</span>
