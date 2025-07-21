@@ -43,6 +43,13 @@ interface Stats {
   ],
   template: `
     <div class="container mx-auto px-4 py-8">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold">Profile</h1>
+        <button mat-button color="primary" routerLink="/dashboard">
+          <mat-icon>arrow_back</mat-icon> Back to Dashboard
+        </button>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column -->
         <div class="lg:col-span-1">
@@ -258,7 +265,12 @@ export class ProfileComponent implements OnInit {
 
   get userInitials(): string {
     if (!this.user?.username) return '';
-    return this.user.username.substring(0, 2).toUpperCase();
+    const username = this.user.username;
+    // Get first letter and last letter
+    if (username.length === 1) {
+      return username.toUpperCase();
+    }
+    return (username.charAt(0) + username.charAt(username.length - 1)).toUpperCase();
   }
 
   get formattedUsername(): string {

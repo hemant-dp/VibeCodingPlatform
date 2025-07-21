@@ -40,6 +40,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'submissions/:id',
+    loadComponent: () => import('./components/submission/submission-detail/submission-detail.component').then(m => m.SubmissionDetailComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'profile',
     loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
     canActivate: [authGuard]

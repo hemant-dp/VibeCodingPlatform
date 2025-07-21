@@ -1,3 +1,8 @@
+-- Insert admin user if not exists
+INSERT INTO users (username, email, password_hash, role)
+SELECT 'admin', 'admin@cognizant.com', '$2a$10$KHR.CfkJe1WBPrPYpMXXBeXyEzQGQJ9qY1XgBVk8bvZXvgq3dFTVi', 'ADMIN'
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
+
 -- Insert sample problems
 INSERT INTO problems (title, description, constraints, difficulty, tags, input_format, output_format, created_by)
 VALUES 
@@ -49,6 +54,7 @@ VALUES
 (3, '5\n1 2 3 null null', '6', true),
 (3, '5\n-10 9 20 null null 15 7', '42', true),
 (3, '3\n2 -1 -2', '2', false);
+(12, '0 1\n\n1', '1.0', false);
 
 -- Insert sample submissions
 INSERT INTO submissions (user_id, problem_id, code, language, status, execution_time_ms, memory_used_kb, submitted_at)

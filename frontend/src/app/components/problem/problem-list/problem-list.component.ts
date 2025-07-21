@@ -6,6 +6,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { FormsModule } from '@angular/forms';
 import { ProblemService } from '../../../services/problem.service';
 
 interface Problem {
@@ -27,16 +32,54 @@ interface Problem {
     MatChipsModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatPaginatorModule,
+    FormsModule
   ],
   template: `
     <div class="container mx-auto px-4 py-8">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold">Problem List</h1>
+        <button mat-button color="primary" routerLink="/dashboard">
+          <mat-icon>arrow_back</mat-icon> Back to Dashboard
+        </button>
+      </div>
+      
       <div class="bg-white rounded-lg shadow">
         <div class="p-6">
-          <h1 class="text-2xl font-semibold mb-6">Problem List</h1>
+          <!-- Filters -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Search problems</mat-label>
+              <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilters()" placeholder="Search by title or tag">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Difficulty</mat-label>
+              <mat-select [(ngModel)]="difficultyFilter" (selectionChange)="applyFilters()">
+                <mat-option value="ALL">All Difficulties</mat-option>
+                <mat-option value="EASY">Easy</mat-option>
+                <mat-option value="MEDIUM">Medium</mat-option>
+                <mat-option value="HARD">Hard</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilters()">
+                <mat-option value="ALL">All Problems</mat-option>
+                <mat-option value="SOLVED">Solved</mat-option>
+                <mat-option value="UNSOLVED">Unsolved</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
           
           <div class="overflow-x-auto">
-            <table mat-table [dataSource]="problems" class="w-full">
+            <table mat-table [dataSource]="filteredProblems" class="w-full">
               <!-- Status Column -->
               <ng-container matColumnDef="status">
                 <th mat-header-cell *matHeaderCellDef class="w-16"> Status </th>
@@ -74,9 +117,10 @@ interface Problem {
                 <th mat-header-cell *matHeaderCellDef> Tags </th>
                 <td mat-cell *matCellDef="let problem">
                   <mat-chip-set>
-                    <mat-chip *ngFor="let tag of problem.tags" class="bg-gray-100 text-sm">
+                    <mat-chip *ngFor="let tag of problem.tags.slice(0, 3)" class="bg-gray-100 text-xs">
                       {{ tag }}
                     </mat-chip>
+                    <span *ngIf="problem.tags.length > 3" class="text-xs text-gray-500">+{{ problem.tags.length - 3 }}</span>
                   </mat-chip-set>
                 </td>
               </ng-container>
@@ -90,7 +134,9 @@ interface Problem {
               </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                  [routerLink]="['/problems', row.id]" 
+                  class="cursor-pointer hover:bg-gray-50"></tr>
             </table>
 
             <!-- Loading Spinner -->
@@ -99,10 +145,19 @@ interface Problem {
             </div>
 
             <!-- No Problems Message -->
-            <div *ngIf="!loading && problems.length === 0" class="text-center py-8 text-gray-500">
-              No problems found
+            <div *ngIf="!loading && filteredProblems.length === 0" class="text-center py-8 text-gray-500">
+              No problems found matching your filters
             </div>
           </div>
+          
+          <!-- Pagination -->
+          <mat-paginator 
+            [length]="problems.length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[10, 25, 50, 100]"
+            (page)="onPageChange($event)"
+            aria-label="Select page of problems">
+          </mat-paginator>
         </div>
       </div>
     </div>
@@ -133,9 +188,121 @@ interface Problem {
   `]
 })
 export class ProblemListComponent implements OnInit {
+  // All problems
   problems: Problem[] = [];
+  // Filtered problems (for display)
+  filteredProblems: Problem[] = [];
   loading = true;
   displayedColumns = ['status', 'title', 'difficulty', 'tags', 'acceptanceRate'];
+  
+  // Filters
+  searchTerm = '';
+  difficultyFilter = 'ALL';
+  statusFilter = 'ALL';
+  
+  // Pagination
+  pageSize = 25;
+  currentPage = 0;
+
+  // Mock data for problems
+  mockProblems: Problem[] = [
+    {
+      id: 1,
+      title: 'Two Sum',
+      difficulty: 'EASY',
+      tags: ['Array', 'Hash Table'],
+      acceptanceRate: 78,
+      solved: true
+    },
+    {
+      id: 2,
+      title: 'Maximum Subarray',
+      difficulty: 'MEDIUM',
+      tags: ['Array', 'Dynamic Programming', 'Divide and Conquer'],
+      acceptanceRate: 65,
+      solved: false
+    },
+    {
+      id: 3,
+      title: 'Binary Tree Maximum Path Sum',
+      difficulty: 'HARD',
+      tags: ['Binary Tree', 'DFS', 'Dynamic Programming'],
+      acceptanceRate: 47,
+      solved: false
+    },
+    {
+      id: 4,
+      title: 'FizzBuzz',
+      difficulty: 'EASY',
+      tags: ['Math', 'String'],
+      acceptanceRate: 92,
+      solved: true
+    },
+    {
+      id: 5,
+      title: 'Valid Parentheses',
+      difficulty: 'EASY',
+      tags: ['String', 'Stack'],
+      acceptanceRate: 81,
+      solved: false
+    },
+    {
+      id: 6,
+      title: 'Merge Two Sorted Lists',
+      difficulty: 'EASY',
+      tags: ['Linked List', 'Recursion'],
+      acceptanceRate: 75,
+      solved: true
+    },
+    {
+      id: 7,
+      title: 'Best Time to Buy and Sell Stock',
+      difficulty: 'EASY',
+      tags: ['Array', 'Dynamic Programming'],
+      acceptanceRate: 83,
+      solved: false
+    },
+    {
+      id: 8,
+      title: 'Longest Substring Without Repeating Characters',
+      difficulty: 'MEDIUM',
+      tags: ['Hash Table', 'String', 'Sliding Window'],
+      acceptanceRate: 62,
+      solved: false
+    },
+    {
+      id: 9,
+      title: 'Add Two Numbers',
+      difficulty: 'MEDIUM',
+      tags: ['Linked List', 'Math', 'Recursion'],
+      acceptanceRate: 71,
+      solved: false
+    },
+    {
+      id: 10,
+      title: 'Container With Most Water',
+      difficulty: 'MEDIUM',
+      tags: ['Array', 'Two Pointers', 'Greedy'],
+      acceptanceRate: 58,
+      solved: true
+    },
+    {
+      id: 11,
+      title: 'Regular Expression Matching',
+      difficulty: 'HARD',
+      tags: ['String', 'Dynamic Programming', 'Recursion'],
+      acceptanceRate: 41,
+      solved: false
+    },
+    {
+      id: 12,
+      title: 'Median of Two Sorted Arrays',
+      difficulty: 'HARD',
+      tags: ['Array', 'Binary Search', 'Divide and Conquer'],
+      acceptanceRate: 36,
+      solved: false
+    }
+  ];
 
   constructor(private problemService: ProblemService) {}
 
@@ -145,6 +312,14 @@ export class ProblemListComponent implements OnInit {
 
   private loadProblems() {
     this.loading = true;
+    
+    // Use mock data instead of API call
+    this.problems = this.mockProblems;
+    this.applyFilters();
+    this.loading = false;
+    
+    // Keep this commented out for now, but it's the original API call
+    /*
     this.problemService.getAllProblems().subscribe({
       next: (problems) => {
         this.problems = problems.map(p => ({
@@ -152,12 +327,54 @@ export class ProblemListComponent implements OnInit {
           acceptanceRate: 0, // This should be calculated from submissions
           solved: false // This should be determined by user's submissions
         }));
+        this.applyFilters();
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading problems:', error);
+        // Load mock data as fallback
+        this.problems = this.mockProblems;
+        this.applyFilters();
         this.loading = false;
       }
     });
+    */
+  }
+  
+  // Apply filters to problems
+  applyFilters() {
+    // Start with all problems
+    let result = [...this.problems];
+    
+    // Apply search filter
+    if (this.searchTerm) {
+      const searchTermLower = this.searchTerm.toLowerCase();
+      result = result.filter(problem => 
+        problem.title.toLowerCase().includes(searchTermLower) || 
+        problem.tags.some(tag => tag.toLowerCase().includes(searchTermLower))
+      );
+    }
+    
+    // Apply difficulty filter
+    if (this.difficultyFilter !== 'ALL') {
+      result = result.filter(problem => problem.difficulty === this.difficultyFilter);
+    }
+    
+    // Apply status filter
+    if (this.statusFilter === 'SOLVED') {
+      result = result.filter(problem => problem.solved);
+    } else if (this.statusFilter === 'UNSOLVED') {
+      result = result.filter(problem => !problem.solved);
+    }
+    
+    // Update filtered problems
+    this.filteredProblems = result;
+    this.currentPage = 0; // Reset to first page when filters change
+  }
+  
+  // Handle pagination events
+  onPageChange(event: any) {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
   }
 } 

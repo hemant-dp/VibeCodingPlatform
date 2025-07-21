@@ -133,6 +133,45 @@ export class DashboardComponent implements OnInit {
   recentProblems: Problem[] = [];
   recentSubmissions: Submission[] = [];
 
+  // Mock data for recent problems
+  mockProblems: Problem[] = [
+    {
+      id: 1,
+      title: 'Two Sum',
+      difficulty: 'EASY',
+      tags: ['Array', 'Hash Table'],
+      createdAt: '2025-07-18T10:30:00Z'
+    },
+    {
+      id: 10,
+      title: 'Container With Most Water',
+      difficulty: 'MEDIUM',
+      tags: ['Array', 'Two Pointers', 'Greedy'],
+      createdAt: '2025-07-17T14:20:00Z'
+    },
+    {
+      id: 12,
+      title: 'Median of Two Sorted Arrays',
+      difficulty: 'HARD',
+      tags: ['Array', 'Binary Search', 'Divide and Conquer'],
+      createdAt: '2025-07-16T09:45:00Z'
+    },
+    {
+      id: 8,
+      title: 'Longest Substring Without Repeating Characters',
+      difficulty: 'MEDIUM',
+      tags: ['Hash Table', 'String', 'Sliding Window'],
+      createdAt: '2025-07-15T16:10:00Z'
+    },
+    {
+      id: 5,
+      title: 'Valid Parentheses',
+      difficulty: 'EASY',
+      tags: ['String', 'Stack'],
+      createdAt: '2025-07-14T11:55:00Z'
+    }
+  ];
+
   constructor(
     private problemService: ProblemService,
     private submissionService: SubmissionService
@@ -144,14 +183,20 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadRecentProblems(): void {
+    // Use mock data instead of API call
+    this.recentProblems = this.mockProblems;
+
+    // Keep this commented out, but it's the original API call
+    /*
     this.problemService.getRecentProblems(5).pipe(
       catchError(error => {
         console.error('Error loading recent problems:', error);
-        return of([]);
+        return of(this.mockProblems); // Use mock data as fallback
       })
     ).subscribe(problems => {
-      this.recentProblems = problems;
+      this.recentProblems = problems.length > 0 ? problems : this.mockProblems;
     });
+    */
   }
 
   private loadRecentSubmissions(): void {

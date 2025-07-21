@@ -305,12 +305,22 @@ export class AppComponent implements OnInit {
   }
 
   getUserInitial(): string {
-    if (!this.currentUser?.fullName) return '';
-    return this.currentUser.fullName
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
+    // If we have a full name, use the first letter of first and last names
+    if (this.currentUser?.fullName) {
+      const nameParts = this.currentUser.fullName.split(' ').filter(part => part.trim().length > 0);
+      if (nameParts.length === 0) return '';
+      if (nameParts.length === 1) return nameParts[0][0].toUpperCase();
+      return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+    }
+    
+    // Fall back to username if no full name
+    if (this.currentUser?.username) {
+      const username = this.currentUser.username;
+      if (username.length === 1) return username.toUpperCase();
+      return (username.charAt(0) + username.charAt(username.length - 1)).toUpperCase();
+    }
+    
+    return '';
   }
 
   onLogout(): void {
