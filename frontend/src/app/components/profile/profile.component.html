@@ -1,0 +1,102 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="flex flex-col items-center justify-center h-64">
+    <mat-icon class="text-red-500 text-6xl mb-4">error_outline</mat-icon>
+    <p class="text-xl text-gray-700 mb-4">Failed to load profile</p>
+    <button mat-raised-button color="primary" (click)="loadUserProfile()">
+      Try Again
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error && user" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Column - User Info -->
+    <div class="lg:col-span-1">
+      <mat-card>
+        <div class="p-6">
+          <!-- User Header -->
+          <div class="flex items-center mb-6">
+            <div class="w-20 h-20 rounded-full bg-[#0033A1] text-white flex items-center justify-center text-3xl font-semibold">
+              {{user.username.charAt(0).toUpperCase()}}
+            </div>
+            <div class="ml-4">
+              <h2 class="text-2xl font-semibold">{{user.fullName}}</h2>
+              <p class="text-gray-600">{{'@' + user.username}}</p>
+            </div>
+          </div>
+
+          <!-- User Stats -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <span class="text-gray-600">Problems Solved</span>
+              <span class="font-semibold">{{user.problemsSolved}}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <span class="text-gray-600">Total Submissions</span>
+              <span class="font-semibold">{{user.totalSubmissions}}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <span class="text-gray-600">Acceptance Rate</span>
+              <span class="font-semibold">{{user.acceptanceRate}}%</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <span class="text-gray-600">Joined</span>
+              <span class="font-semibold">{{user.joinDate | date}}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Right Column - Recent Activity -->
+    <div class="lg:col-span-2">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Recent Submissions</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="p-4">
+            <div *ngIf="recentSubmissions.length > 0" class="space-y-4">
+              <div *ngFor="let submission of recentSubmissions" 
+                   class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <a [routerLink]="['/problems', submission.problemId]" 
+                       class="text-blue-600 hover:text-blue-800 hover:underline font-medium">
+                      {{submission.problemTitle}}
+                    </a>
+                    <div class="text-sm text-gray-600">
+                      {{submission.submittedAt | date:'medium'}}
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">{{submission.language}}</span>
+                    <span [class]="getStatusColor(submission.status)"
+                          class="px-3 py-1 rounded-full text-sm font-medium">
+                      {{submission.status}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="recentSubmissions.length === 0" class="text-center py-8">
+              <mat-icon class="text-gray-400 text-6xl mb-4">code</mat-icon>
+              <p class="text-xl text-gray-600">No submissions yet</p>
+              <button mat-raised-button color="primary" routerLink="/problems" class="mt-4">
+                Start Solving
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div> 

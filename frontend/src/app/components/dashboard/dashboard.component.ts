@@ -184,10 +184,10 @@ export class DashboardComponent implements OnInit {
 
   private loadRecentProblems(): void {
     // Use mock data instead of API call
-    this.recentProblems = this.mockProblems;
+    // this.recentProblems = this.mockProblems;
 
     // Keep this commented out, but it's the original API call
-    /*
+    
     this.problemService.getRecentProblems(5).pipe(
       catchError(error => {
         console.error('Error loading recent problems:', error);
@@ -196,7 +196,7 @@ export class DashboardComponent implements OnInit {
     ).subscribe(problems => {
       this.recentProblems = problems.length > 0 ? problems : this.mockProblems;
     });
-    */
+    
   }
 
   private loadRecentSubmissions(): void {

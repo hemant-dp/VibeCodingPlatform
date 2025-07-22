@@ -314,15 +314,16 @@ export class ProblemListComponent implements OnInit {
     this.loading = true;
     
     // Use mock data instead of API call
-    this.problems = this.mockProblems;
-    this.applyFilters();
-    this.loading = false;
+    // this.problems = this.mockProblems;
+    // this.applyFilters();
+    // this.loading = false;
     
     // Keep this commented out for now, but it's the original API call
-    /*
+    
     this.problemService.getAllProblems().subscribe({
       next: (problems) => {
         this.problems = problems.map(p => ({
+          
           ...p,
           acceptanceRate: 0, // This should be calculated from submissions
           solved: false // This should be determined by user's submissions
@@ -338,7 +339,7 @@ export class ProblemListComponent implements OnInit {
         this.loading = false;
       }
     });
-    */
+    
   }
   
   // Apply filters to problems
