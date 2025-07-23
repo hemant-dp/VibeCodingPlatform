@@ -4,12 +4,15 @@ import com.vibe.platform.dto.problem.ProblemListResponse;
 import com.vibe.platform.dto.problem.ProblemRequest;
 import com.vibe.platform.dto.problem.ProblemResponse;
 import com.vibe.platform.model.Problem;
+import com.vibe.platform.model.Submission;
 import com.vibe.platform.repository.ProblemRepository;
 import com.vibe.platform.repository.SubmissionRepository;
 import com.vibe.platform.service.ProblemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
 @Tag(name = "Problem Controller", description = "APIs for managing coding problems")
 public class ProblemController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProblemController.class);
+
     @Autowired
     private ProblemService problemService;
 
@@ -39,12 +44,13 @@ public class ProblemController {
     public ResponseEntity<List<ProblemListResponse>> getAllProblems(Authentication authentication) {
         List<Problem> problems = problemRepository.findAll();
         String username = authentication != null ? authentication.getName() : null;
+        logger.info("Getting all problems for user: {}", username != null ? username : "anonymous");
 
         List<ProblemListResponse> response = problems.stream()
             .map(problem -> {
                 // Calculate acceptance rate
                 long totalSubmissions = submissionRepository.countByProblemId(problem.getId());
-                long acceptedSubmissions = submissionRepository.countByProblemIdAndStatus(problem.getId(), "ACCEPTED");
+                long acceptedSubmissions = submissionRepository.countByProblemIdAndStatus(problem.getId(), Submission.Status.ACCEPTED);
                 int acceptanceRate = totalSubmissions > 0 
                     ? (int) ((acceptedSubmissions * 100.0) / totalSubmissions) 
                     : 0;
@@ -53,7 +59,7 @@ public class ProblemController {
                 boolean solved = false;
                 if (username != null) {
                     solved = submissionRepository.existsByProblemIdAndUserUsernameAndStatus(
-                        problem.getId(), username, "ACCEPTED");
+                        problem.getId(), username, Submission.Status.ACCEPTED);
                 }
 
                 return ProblemListResponse.builder()
