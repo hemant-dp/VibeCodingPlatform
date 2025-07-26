@@ -12,6 +12,14 @@ export interface Problem {
   outputFormat?: string;
   tags: string[];
   createdAt?: string;
+  testCases?: TestCase[];
+}
+
+export interface TestCase {
+  id: number;
+  input: string;
+  expectedOutput: string;
+  isSample: boolean;
 }
 
 @Injectable({

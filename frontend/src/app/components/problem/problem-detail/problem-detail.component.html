@@ -38,7 +38,25 @@
 
 <!-- Main Content -->
 <div class="container mx-auto px-4 py-4">
-  <div class="grid grid-cols-2 gap-4">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <mat-spinner></mat-spinner>
+    <span class="ml-4">Loading problem details...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="flex justify-center items-center h-64">
+    <div class="text-center">
+      <mat-icon class="text-red-500 text-4xl mb-2">error</mat-icon>
+      <p class="text-red-500">{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadProblem()" class="mt-4">
+        Retry
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="problem && !loading" class="grid grid-cols-2 gap-4">
     <!-- Left Panel -->
     <div class="bg-white rounded-lg shadow">
       <!-- Tabs -->
@@ -50,10 +68,10 @@
             <!-- Difficulty and Tags -->
             <div class="flex items-center space-x-4 mb-6">
               <div class="flex flex-wrap gap-2">
-                <mat-chip-option [color]="problem.difficulty === 'Easy' ? 'primary' : problem.difficulty === 'Medium' ? 'accent' : 'warn'">
-                  {{problem.difficulty}}
+                <mat-chip-option [color]="getDifficultyDisplayValue() === 'Easy' ? 'primary' : getDifficultyDisplayValue() === 'Medium' ? 'accent' : 'warn'">
+                  {{getDifficultyDisplayValue()}}
                 </mat-chip-option>
-                <mat-chip-option *ngFor="let topic of problem.topics">
+                <mat-chip-option *ngFor="let topic of problem.tags">
                   {{topic}}
                 </mat-chip-option>
               </div>
@@ -64,30 +82,20 @@
               <p class="mb-4">{{problem.description}}</p>
 
               <!-- Examples -->
-              <div class="mt-6" *ngFor="let example of problem.examples; let i = index">
+              <div class="mt-6" *ngFor="let example of examples; let i = index">
                 <h3 class="font-medium">Example {{i + 1}}:</h3>
                 <div class="bg-gray-50 p-4 rounded-lg mt-2">
                   <p><strong>Input:</strong> {{example.input}}</p>
                   <p><strong>Output:</strong> {{example.output}}</p>
-                  <p><strong>Explanation:</strong> {{example.explanation}}</p>
+                  <p *ngIf="example.explanation"><strong>Explanation:</strong> {{example.explanation}}</p>
                 </div>
               </div>
 
               <!-- Constraints -->
-              <div class="mt-6">
+              <div class="mt-6" *ngIf="problem.constraints">
                 <h3 class="font-medium">Constraints:</h3>
-                <ul class="list-disc pl-5 mt-2">
-                  <li *ngFor="let constraint of problem.constraints">{{constraint}}</li>
-                </ul>
-              </div>
-
-              <!-- Companies -->
-              <div class="mt-6">
-                <h3 class="font-medium">Companies:</h3>
-                <div class="flex flex-wrap gap-2 mt-2">
-                  <mat-chip-option *ngFor="let company of problem.companies" class="company-chip">
-                    {{company}}
-                  </mat-chip-option>
+                <div class="bg-gray-50 p-4 rounded-lg mt-2">
+                  <p>{{problem.constraints}}</p>
                 </div>
               </div>
             </div>
@@ -143,4 +151,4 @@
       </div>
     </div>
   </div>
-</div> 
+</div>
