@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.container {
+  max-width: 1440px;
+}
+
+/* Table Styles */
+.mat-mdc-table {
+  width: 100%;
+  background: transparent;
+}
+
+.mat-mdc-header-cell {
+  font-weight: 600;
+  color: #374151;
+  padding: 16px;
+  white-space: nowrap;
+}
+
+.mat-mdc-cell {
+  padding: 16px;
+}
+
+/* Status Badge Styles */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-badge.accepted {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.status-badge.wrong {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.status-badge.timeout {
+  background-color: #fffbeb;
+  color: #d97706;
+}
+
+.status-badge.pending {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .mat-mdc-header-cell,
+  .mat-mdc-cell {
+    padding: 12px 8px;
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+} 

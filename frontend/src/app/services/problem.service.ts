@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 
 export interface Problem {
   id: number;
   title: string;
-  description: string;
+  description?: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   constraints?: string;
   inputFormat?: string;
   outputFormat?: string;
   tags: string[];
-  testCases: TestCase[];
-  createdAt?: Date;
+  createdAt?: string;
+  testCases?: TestCase[];
 }
 
 export interface TestCase {
@@ -27,32 +26,25 @@ export interface TestCase {
   providedIn: 'root'
 })
 export class ProblemService {
-  private apiUrl = `${environment.apiUrl}/problems`;
+  private apiUrl = 'http://localhost:8081/api/problems';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getProblems(): Observable<Problem[]> {
+  getAllProblems(): Observable<Problem[]> {
     return this.http.get<Problem[]>(this.apiUrl);
   }
 
-  getProblem(id: number): Observable<Problem> {
+  getRecentProblems(limit: number = 5): Observable<Problem[]> {
+    return this.http.get<Problem[]>(`${this.apiUrl}/recent`, {
+      params: { limit: limit.toString() }
+    });
+  }
+
+  getProblemById(id: number): Observable<Problem> {
     return this.http.get<Problem>(`${this.apiUrl}/${id}`);
   }
 
-  createProblem(problem: Partial<Problem>): Observable<Problem> {
-    return this.http.post<Problem>(this.apiUrl, problem);
-  }
-
-  updateProblem(id: number, problem: Partial<Problem>): Observable<Problem> {
-    return this.http.put<Problem>(`${this.apiUrl}/${id}`, problem);
-  }
-
-  deleteProblem(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  getRecentProblems(limit: number = 5): Observable<Problem[]> {
-    const params = new HttpParams().set('limit', limit.toString());
-    return this.http.get<Problem[]>(`${this.apiUrl}/recent`, { params });
+  submitSolution(problemId: number, code: string, language: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${problemId}/submit`, { code, language });
   }
 } 

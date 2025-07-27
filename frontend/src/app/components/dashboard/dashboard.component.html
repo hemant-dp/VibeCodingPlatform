@@ -1,0 +1,84 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Recent Problems Card -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Recent Problems</mat-card-title>
+      </mat-card-header>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="flex justify-center items-center p-8">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error" class="p-8 text-center">
+        <mat-icon class="text-red-500 text-4xl mb-2">error_outline</mat-icon>
+        <p class="text-gray-700">Failed to load problems</p>
+        <button mat-button color="primary" (click)="loadRecentProblems()">
+          Try Again
+        </button>
+      </div>
+
+      <!-- Content -->
+      <mat-card-content *ngIf="!loading && !error">
+        <div *ngIf="recentProblems.length > 0" class="space-y-4 p-4">
+          <div *ngFor="let problem of recentProblems" 
+               class="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+               [routerLink]="['/problems', problem.id]">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-medium text-lg">{{problem.title}}</h3>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <span *ngFor="let topic of problem.topics" 
+                        class="px-2 py-1 bg-gray-100 rounded-full text-sm">
+                    {{topic}}
+                  </span>
+                </div>
+              </div>
+              <span [class]="getDifficultyColor(problem.difficulty)"
+                    class="px-3 py-1 rounded-full text-sm font-medium">
+                {{problem.difficulty}}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && recentProblems.length === 0" class="p-8 text-center">
+          <mat-icon class="text-gray-400 text-4xl mb-2">assignment</mat-icon>
+          <p class="text-gray-600">No recent problems available</p>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary" routerLink="/problems">
+          View All Problems
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Recent Submissions Card -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Recent Submissions</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="p-8 text-center text-gray-600">
+          <mat-icon class="text-gray-400 text-4xl mb-2">code</mat-icon>
+          <p>Start solving problems to see your submissions here</p>
+          <button mat-raised-button color="primary" class="mt-4" routerLink="/problems">
+            Practice Now
+          </button>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary" routerLink="/submissions">
+          View All Submissions
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div> 

@@ -1,0 +1,101 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-lg">
+    <!-- Header -->
+    <div class="p-6 border-b">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-semibold text-gray-800">Problem List</h1>
+        <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-8">
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center p-16">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="flex flex-col items-center justify-center p-16">
+      <mat-icon class="text-red-500 text-6xl mb-4">error_outline</mat-icon>
+      <p class="text-xl text-gray-700 mb-4">Failed to load problems</p>
+      <button mat-raised-button color="primary" (click)="loadProblems()">
+        Try Again
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!loading && !error" class="overflow-x-auto">
+      <table mat-table [dataSource]="problems" class="w-full">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef class="font-semibold"> # </th>
+          <td mat-cell *matCellDef="let problem"> {{problem.id}} </td>
+        </ng-container>
+
+        <!-- Title Column -->
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef class="font-semibold"> Title </th>
+          <td mat-cell *matCellDef="let problem">
+            <a [routerLink]="['/problems', problem.id]" 
+               class="text-blue-600 hover:text-blue-800 hover:underline">
+              {{problem.title}}
+            </a>
+          </td>
+        </ng-container>
+
+        <!-- Difficulty Column -->
+        <ng-container matColumnDef="difficulty">
+          <th mat-header-cell *matHeaderCellDef class="font-semibold"> Difficulty </th>
+          <td mat-cell *matCellDef="let problem">
+            <span [class]="getDifficultyColor(problem.difficulty)"
+                  class="px-3 py-1 rounded-full text-sm font-medium">
+              {{problem.difficulty}}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Topics Column -->
+        <ng-container matColumnDef="topics">
+          <th mat-header-cell *matHeaderCellDef class="font-semibold"> Topics </th>
+          <td mat-cell *matCellDef="let problem">
+            <div class="flex flex-wrap gap-2">
+              <mat-chip-option *ngFor="let topic of problem.topics" 
+                              [selectable]="false"
+                              class="!min-h-0">
+                {{topic}}
+              </mat-chip-option>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="font-semibold"> Actions </th>
+          <td mat-cell *matCellDef="let problem">
+            <button mat-icon-button [routerLink]="['/problems', problem.id]" 
+                    color="primary"
+                    matTooltip="Solve Problem">
+              <mat-icon>code</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <!-- Header and Row Definitions -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            class="hover:bg-gray-50 transition-colors"></tr>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && problems.length === 0" class="p-16 text-center">
+        <mat-icon class="text-gray-400 text-6xl mb-4">assignment</mat-icon>
+        <p class="text-xl text-gray-600">No problems available</p>
+      </div>
+
+      <!-- Paginator -->
+      <mat-paginator [pageSize]="10"
+                    [pageSizeOptions]="[5, 10, 25, 100]"
+                    aria-label="Select page of problems">
+      </mat-paginator>
+    </div>
+  </div>
+</div> 

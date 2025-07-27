@@ -5,6 +5,14 @@ import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  fullName: string;
+  role: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -13,6 +21,7 @@ export class AuthService {
   private tokenKey = 'auth_token';
   private userKey = 'user_info';
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
+  private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
 
   constructor(
     private http: HttpClient,
@@ -24,10 +33,15 @@ export class AuthService {
       .pipe(
         tap((response: any) => {
           this.setToken(response.token);
-          this.setUserInfo({
+          const user: User = {
+            id: response.id,
             username: response.username,
+            email: response.email,
+            fullName: response.fullName,
             role: response.role
-          });
+          };
+          this.setUserInfo(user);
+          this.currentUserSubject.next(user);
           this.isAuthenticatedSubject.next(true);
         })
       );
@@ -41,6 +55,7 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
     this.isAuthenticatedSubject.next(false);
+    this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
@@ -56,11 +71,15 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, token);
   }
 
-  private setUserInfo(user: any): void {
+  private setUserInfo(user: User): void {
     localStorage.setItem(this.userKey, JSON.stringify(user));
   }
 
-  getUserInfo(): any {
+  getUserInfo(): User | null {
+    return this.getUserFromStorage();
+  }
+
+  private getUserFromStorage(): User | null {
     const userInfo = localStorage.getItem(this.userKey);
     return userInfo ? JSON.parse(userInfo) : null;
   }
@@ -72,5 +91,9 @@ export class AuthService {
 
   getAuthStatus(): Observable<boolean> {
     return this.isAuthenticatedSubject.asObservable();
+  }
+
+  getCurrentUser(): Observable<User | null> {
+    return this.currentUserSubject.asObservable();
   }
 } 

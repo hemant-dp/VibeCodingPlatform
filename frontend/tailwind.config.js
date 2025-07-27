@@ -20,6 +20,11 @@ module.exports = {
           800: '#1565c0',
           900: '#0d47a1',
         },
+        cognizant: {
+          blue: '#0033A0',
+          'blue-dark': '#002882',
+          'blue-light': '#0047E0',
+        }
       },
       fontFamily: {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
