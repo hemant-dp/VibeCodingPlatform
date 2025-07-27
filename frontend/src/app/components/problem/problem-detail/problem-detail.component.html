@@ -1,64 +1,74 @@
   <!-- Header -->
   <div class="header bg-[#000033] text-white">
     <div class="container mx-auto px-4 py-2">
-      <div class="flex items-center justify-between h-14">
-        <!-- Left Section -->
-        <div class="flex items-center">
-          <a routerLink="/problems" class="flex items-center hover:opacity-90 transition-opacity">
-            <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-8">
-          </a>
-          <div class="h-8 w-px bg-white/10 mx-4"></div>
-          <span class="font-medium tracking-wide uppercase text-sm text-white/90">Problems List</span>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <!-- Logo and Navigation -->
+          <div class="flex items-center">
+            <a routerLink="/problems" class="flex items-center hover:opacity-90 transition-opacity">
+              <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-8">
+            </a>
+            <div class="h-8 w-px bg-white/10 mx-4"></div>
+            <div class="flex items-center">
+              <a routerLink="/problems" class="flex items-center space-x-2 text-white/90 hover:text-white transition-colors">
+                <!-- <mat-icon class="text-lg transform -translate-y-[1px]">arrow_back</mat-icon> -->
+                <span class="font-medium tracking-wide uppercase text-sm">Problems List</span>
+              </a>
+            </div>
+          </div>
+          
+          <!-- Navigation Arrows -->
+          <div class="flex items-center bg-white/5 rounded-lg p-0.5 ml-6">
+            <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+            <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
+              <mat-icon>shuffle</mat-icon>
+            </button>
+          </div>
         </div>
 
-        <!-- Center Section -->
-        <div class="flex items-center space-x-6">
-          <!-- Navigation Arrows -->
-          <!-- <div class="flex items-center bg-white/5 rounded-lg p-0.5">
-            <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
-              <mat-icon class="text-xl">chevron_left</mat-icon>
-            </button>
-            <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
-              <mat-icon class="text-xl">chevron_right</mat-icon>
-            </button>
-            <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
-              <mat-icon class="text-xl">shuffle</mat-icon>
-            </button>
-          </div> -->
-
+        <!-- Right Side Tools -->
+        <div class="flex items-center space-x-4">
           <!-- Action Buttons -->
           <div class="flex items-center space-x-2">
             <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
-              <mat-icon class="text-xl">lightbulb</mat-icon>
+              <mat-icon>lightbulb</mat-icon>
             </button>
             <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
-              <mat-icon class="text-xl">play_arrow</mat-icon>
+              <mat-icon>play_arrow</mat-icon>
             </button>
             <button mat-raised-button class="submit-btn" (click)="onSubmit()">
-              <mat-icon class="text-md">check_circle</mat-icon>
+              <mat-icon>check_circle</mat-icon>
               <span>Submit</span>
             </button>
             <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
-              <mat-icon class="text-xl">chat_bubble_outline</mat-icon>
+              <mat-icon>chat_bubble_outline</mat-icon>
             </button>
           </div>
-        </div>
 
-        <!-- Right Section -->
-        <div class="flex items-center space-x-3">
-          <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
-            <mat-icon class="text-xl">apps</mat-icon>
-          </button>
-          <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
-            <mat-icon class="text-xl">settings</mat-icon>
-          </button>
-          <div class="flex items-center space-x-2 bg-white/5 px-3 py-1.5 rounded-full">
-            <mat-icon class="text-xl">local_fire_department</mat-icon>
-            <span class="text-white font-medium">0</span>
-          </div>
-          <div class="flex items-center space-x-2 bg-white/5 px-3 py-1.5 rounded-full">
-            <mat-icon class="text-xl">timer</mat-icon>
-            <span class="text-white font-medium">0</span>
+          <!-- Stats and Settings -->
+          <div class="flex items-center space-x-3">
+            <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
+              <mat-icon>apps</mat-icon>
+            </button>
+            <button mat-icon-button class="text-white hover:bg-white/10 transition-colors">
+              <mat-icon>settings</mat-icon>
+            </button>
+            <div class="flex items-center space-x-2 bg-white/5 px-3 py-1 rounded-full">
+              <mat-icon class="text-white">local_fire_department</mat-icon>
+              <span class="text-white font-medium">0</span>
+            </div>
+            <div class="flex items-center space-x-2 bg-white/5 px-3 py-1 rounded-full">
+              <mat-icon class="text-white">timer</mat-icon>
+              <span class="text-white font-medium">0</span>
+            </div>
+            <!-- <div class="flex items-center bg-[#00B3B3] px-3 py-1 rounded-full">
+              <span class="text-white font-medium">Premium</span>
+            </div> -->
           </div>
         </div>
       </div>
