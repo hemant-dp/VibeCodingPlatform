@@ -4,8 +4,32 @@ import { authGuard } from './guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
-    pathMatch: 'full',
-    loadComponent: () => import('./components/landing/landing.component').then(m => m.LandingComponent)
+    loadComponent: () => import('./components/landing/landing.component').then(m => m.LandingComponent),
+    pathMatch: 'full'
+  },
+  {
+    path: 'about',
+    loadComponent: () => import('./components/about-us/about-us.component').then(m => m.AboutUsComponent)
+  },
+  {
+    path: 'products',
+    loadComponent: () => import('./components/products/products.component').then(m => m.ProductsComponent)
+  },
+  {
+    path: 'solutions',
+    loadComponent: () => import('./components/solutions/solutions.component').then(m => m.SolutionsComponent)
+  },
+  {
+    path: 'resources',
+    loadComponent: () => import('./components/resources/resources.component').then(m => m.ResourcesComponent)
+  },
+  {
+    path: 'pricing',
+    loadComponent: () => import('./components/pricing/pricing.component').then(m => m.PricingComponent)
+  },
+  {
+    path: 'developers',
+    loadComponent: () => import('./components/developers/developers.component').then(m => m.DevelopersComponent)
   },
   {
     path: 'selection',
