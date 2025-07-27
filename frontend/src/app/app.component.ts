@@ -25,7 +25,7 @@ import { User } from './services/auth.service';
   ],
   template: `
     <div class="min-h-screen flex flex-col">
-      @if (!isLandingPage) {
+      @if (!isLandingPage && !isProblemDetailPage) {
         <div class="sticky top-0 z-50 bg-white transition-shadow duration-300" [class.shadow-md]="isScrolled">
           <mat-toolbar class="px-4">
             <div class="container mx-auto flex items-center justify-between h-16">
@@ -275,6 +275,7 @@ import { User } from './services/auth.service';
 })
 export class AppComponent implements OnInit {
   isLandingPage = false;
+  isProblemDetailPage = false;
   isScrolled = false;
   currentUser: User | null = null;
 
@@ -291,6 +292,7 @@ export class AppComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.isLandingPage = event.url === '/';
+      this.isProblemDetailPage = event.url.includes('/problems/') && !event.url.endsWith('/problems/');
     });
   }
 
