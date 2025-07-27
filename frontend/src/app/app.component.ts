@@ -40,30 +40,23 @@ import { User } from './services/auth.service';
 
                 <!-- Primary Navigation -->
                 <nav class="hidden lg:flex items-center space-x-1">
-                  <a routerLink="/products" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/products')">
-                    Products
+                  <a routerLink="/products" class="nav-link" [class.active]="router.url.includes('/products')">
+                    <mat-icon class="nav-icon">apps</mat-icon> Products
                   </a>
-                  <a routerLink="/solutions" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/solutions')">
-                    Solutions
+                  <a routerLink="/solutions" class="nav-link" [class.active]="router.url.includes('/solutions')">
+                    <mat-icon class="nav-icon">lightbulb</mat-icon> Solutions
                   </a>
-                  <a routerLink="/resources" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/resources')">
-                    Resources
+                  <a routerLink="/resources" class="nav-link" [class.active]="router.url.includes('/resources')">
+                    <mat-icon class="nav-icon">menu_book</mat-icon> Resources
                   </a>
-                  <a routerLink="/pricing" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/pricing')">
-                    Pricing
+                  <a routerLink="/pricing" class="nav-link" [class.active]="router.url.includes('/pricing')">
+                    <mat-icon class="nav-icon">attach_money</mat-icon> Pricing
                   </a>
-                  <a routerLink="/developers" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/developers')">
-                    For Developers
+                  <a routerLink="/developers" class="nav-link" [class.active]="router.url.includes('/developers')">
+                    <mat-icon class="nav-icon">code</mat-icon> For Developers
+                  </a>
+                  <a routerLink="/about" class="nav-link" [class.active]="router.url === '/about'">
+                    <mat-icon class="nav-icon">info</mat-icon> About Us
                   </a>
                 </nav>
               </div>
@@ -160,23 +153,38 @@ import { User } from './services/auth.service';
     }
 
     .nav-link {
-      padding: 8px 16px;
-      color: #374151;
-      font-size: 14px;
-      font-weight: 500;
+      padding: 10px 20px;
+      color: #0033A1;
+      font-size: 15px;
+      font-weight: 600;
       text-decoration: none;
-      transition: color 200ms;
-      border-radius: 4px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #e3f0ff 0%, #f8fbff 100%);
+      box-shadow: 0 2px 8px rgba(0,51,161,0.03);
     }
 
     .nav-link:hover {
-      color: #0033A1;
-      background-color: rgba(0, 51, 161, 0.04);
+      color: #fff;
+      background: linear-gradient(90deg, #0033A1 0%, #0056D2 100%);
+      box-shadow: 0 4px 16px rgba(0,51,161,0.10);
     }
 
     .nav-link.active {
-      color: #0033A1;
-      background-color: rgba(0, 51, 161, 0.08);
+      color: #fff;
+      background: linear-gradient(90deg, #0033A1 0%, #0056D2 100%);
+      box-shadow: 0 4px 16px rgba(0,51,161,0.13);
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      margin-right: 4px;
+      color: inherit;
+      vertical-align: middle;
     }
 
     .nav-link-auth {
