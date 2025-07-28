@@ -45,6 +45,24 @@ export class ProblemDetailComponent implements OnInit {
   code = '';
   selectedTabIndex = 0;
 
+  private languageTemplates: { [key: string]: string } = {
+    'C++': `class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        
+    }
+};`,
+    'Java': `class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        
+    }
+}`,
+    'Python': `class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        
+`
+  };
+
   constructor(
     private route: ActivatedRoute,
     private problemService: ProblemService
@@ -52,6 +70,7 @@ export class ProblemDetailComponent implements OnInit {
 
   ngOnInit() {
     this.loadProblem();
+    this.setLanguageTemplate(this.selectedLanguage);
   }
 
   loadProblem() {
@@ -102,6 +121,11 @@ export class ProblemDetailComponent implements OnInit {
 
   onLanguageChange(language: string) {
     this.selectedLanguage = language;
+    this.setLanguageTemplate(language);
+  }
+
+  private setLanguageTemplate(language: string) {
+    this.code = this.languageTemplates[language] || '';
   }
 
   onSubmit() {
