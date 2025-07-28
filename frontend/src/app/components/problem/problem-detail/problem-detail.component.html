@@ -199,12 +199,24 @@
             </button>
           </div>
         </div>
-        
+        <hr>
         <!-- Code Editor Area -->
-        <div class="h-[500px] bg-white">
-          <textarea [(ngModel)]="code"
-                    class="w-full h-full font-mono p-4 border-none focus:outline-none"
-                    placeholder="Write your code here..."></textarea>
+        <div class="h-[500px] bg-white flex">
+          <!-- Line Numbers -->
+          <div class="line-numbers bg-[#F8FAFC] border-r border-[#E2E8F0] py-4 select-none">
+            <div *ngFor="let number of getLineNumbers()" 
+                 class="text-[#64748B] text-right px-4 font-mono text-sm leading-6">
+              {{number}}
+            </div>
+          </div>
+          
+          <!-- Code Area -->
+          <div class="flex-1">
+            <textarea [(ngModel)]="code"
+                      class="w-full h-full font-mono text-sm p-4 border-none focus:outline-none leading-6"
+                      placeholder="Write your code here..."
+                      (ngModelChange)="onCodeChange($event)"></textarea>
+          </div>
         </div>
 
         <!-- Test Results Section -->

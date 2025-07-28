@@ -33,8 +33,38 @@
 textarea {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 24px;
   resize: none;
+  padding: 12px !important;
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* Line Numbers */
+.line-numbers {
+  min-width: 3.5rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 14px;
+  background-color: #F8FAFC;
+  border-right: 1px solid #E2E8F0;
+}
+
+.line-numbers div {
+  height: 24px;
+  line-height: 24px;
+  color: #64748B;
+  user-select: none;
+}
+
+.line-numbers div:hover {
+  background-color: #F1F5F9;
+}
+
+/* Code Area Container */
+.code-container {
+  position: relative;
+  height: 100%;
+  background-color: white;
 }
 
 /* Toolbar select field */

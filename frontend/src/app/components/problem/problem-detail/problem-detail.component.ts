@@ -44,6 +44,18 @@ export class ProblemDetailComponent implements OnInit {
   selectedLanguage = 'C++';
   code = '';
   selectedTabIndex = 0;
+  lineCount = 5; // minimum lines to show
+
+  getLineNumbers(): number[] {
+    const lines = this.code.split('\n').length;
+    const totalLines = Math.max(lines, this.lineCount);
+    return Array.from({ length: totalLines }, (_, i) => i + 1);
+  }
+
+  onCodeChange(code: string) {
+    this.code = code;
+    this.lineCount = Math.max(code.split('\n').length, 5);
+  }
 
   private languageTemplates: { [key: string]: string } = {
     'C++': `class Solution {
