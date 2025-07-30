@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,71 +30,66 @@ public class ExecutionService {
 
     private final Random random = new Random();
 
+    private String executeJavaCode(String code) {
+        try {
+            // Create a temporary directory
+            Path tempDir = Files.createTempDirectory("javaexecution");
+            
+            // Create Solution.java file
+            Path sourcePath = tempDir.resolve("Solution.java");
+            Files.write(sourcePath, code.getBytes());
+            
+            // Compile the code
+            ProcessBuilder compileBuilder = new ProcessBuilder("javac", sourcePath.toString());
+            Process compileProcess = compileBuilder.start();
+            int compileResult = compileProcess.waitFor();
+            
+            if (compileResult != 0) {
+                String error = new String(compileProcess.getErrorStream().readAllBytes());
+                return "Compilation Error:\n" + error;
+            }
+            
+            // Run the code
+            ProcessBuilder runBuilder = new ProcessBuilder("java", "-cp", tempDir.toString(), "Solution");
+            Process runProcess = runBuilder.start();
+            
+            // Get output and error streams
+            String output = new String(runProcess.getInputStream().readAllBytes());
+            String error = new String(runProcess.getErrorStream().readAllBytes());
+            
+            int runResult = runProcess.waitFor();
+            if (runResult != 0) {
+                return "Runtime Error:\n" + error;
+            }
+            
+            return output;
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
     public ExecutionResponse execute(ExecutionRequest request) {
         try {
-            Problem problem = problemRepository.findById(request.getProblemId())
-                .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    String.format("Problem not found with ID: %d", request.getProblemId())
-                ));
-
-            // Get test cases
-            List<TestCase> testCases = testCaseRepository.findByProblemId(problem.getId());
-            if (testCases.isEmpty()) {
+            String output;
+            if (request.getLanguage().equals("Java")) {
+                output = executeJavaCode(request.getCode());
+            } else {
+                // Add support for other languages here
                 return ExecutionResponse.builder()
                     .status("ERROR")
-                    .error("No test cases available")
+                    .error("Language not supported: " + request.getLanguage())
                     .build();
             }
-
-            // Check for compilation errors
-            String compilationError = checkCompilation(request.getCode(), request.getLanguage());
-            if (compilationError != null) {
-                return ExecutionResponse.builder()
-                    .status("COMPILATION_ERROR")
-                    .error(compilationError)
-                    .build();
-            }
-
-            // Test execution
-            int passedTests = 0;
-            StringBuilder output = new StringBuilder();
-            long startTime = System.currentTimeMillis();
-
-            for (TestCase testCase : testCases) {
-                try {
-                    String result = executeTestCase(request.getCode(), testCase.getInput(), request.getLanguage());
-                    String expected = testCase.getExpectedOutput().trim();
-                    
-                    if (compareOutputs(result, expected)) {
-                        passedTests++;
-                    } else {
-                        output.append("Test case failed\n");
-                        output.append("Input: ").append(testCase.getInput()).append("\n");
-                        output.append("Expected: ").append(expected).append("\n");
-                        output.append("Got: ").append(result).append("\n\n");
-                    }
-                } catch (Exception e) {
-                    output.append("Runtime error on test case: ").append(e.getMessage()).append("\n");
-                }
-            }
-
-            long executionTime = System.currentTimeMillis() - startTime;
-
+            
             return ExecutionResponse.builder()
-                .status(passedTests == testCases.size() ? "SUCCESS" : "WRONG_ANSWER")
-                .output(output.toString())
-                .testCasesPassed(passedTests)
-                .totalTestCases(testCases.size())
-                .executionTimeMs((int) executionTime)
-                .memoryUsedKb((int) (Runtime.getRuntime().totalMemory() / 1024))
+                .status("SUCCESS")
+                .output(output)
                 .build();
-
+                
         } catch (Exception e) {
-            log.error("Error executing code", e);
             return ExecutionResponse.builder()
                 .status("ERROR")
-                .error("Internal error: " + e.getMessage())
+                .error("Failed to execute code: " + e.getMessage())
                 .build();
         }
     }

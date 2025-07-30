@@ -157,8 +157,10 @@ public:
   onSubmit() {
     console.log('Submit button clicked');
     if (!this.problem || !this.code.trim()) {
-      console.warn('Cannot submit: missing problem or code');
-      this.error = 'Please write some code before submitting.';
+      this.executionResult = {
+        status: 'ERROR',
+        error: 'Please write some code before submitting.'
+      };
       return;
     }
 
@@ -169,7 +171,6 @@ public:
     });
 
     this.isRunning = true;
-    this.error = null;
     this.executionResult = null;
 
     this.problemService.submitSolution(this.problem.id, this.code, this.selectedLanguage).subscribe({
@@ -180,7 +181,10 @@ public:
       },
       error: (err) => {
         console.error('Submission failed:', err);
-        this.error = 'Failed to submit solution. Please try again.';
+        this.executionResult = {
+          status: 'ERROR',
+          error: 'Failed to submit solution. Please try again.'
+        };
         this.isRunning = false;
       }
     });
@@ -189,7 +193,10 @@ public:
   onRun() {
     console.log('Run button clicked');
     if (!this.problem || !this.code.trim()) {
-      this.error = 'Please write some code before running.';
+      this.executionResult = {
+        status: 'ERROR',
+        error: 'Please write some code before running.'
+      };
       return;
     }
 
@@ -200,7 +207,6 @@ public:
     });
 
     this.isRunning = true;
-    this.error = null;
     this.executionResult = null;
 
     this.executionService.executeCode(this.problem.id, this.code, this.selectedLanguage)
@@ -208,14 +214,14 @@ public:
         next: (result) => {
           console.log('Execution successful:', result);
           this.executionResult = result;
-          if (result.status !== 'SUCCESS') {
-            this.error = result.error || `Execution failed: ${result.status}`;
-          }
           this.isRunning = false;
         },
         error: (err) => {
           console.error('Code execution failed:', err);
-          this.error = 'Failed to execute code. Please try again.';
+          this.executionResult = {
+            status: 'ERROR',
+            error: 'Failed to execute code. Please try again.'
+          };
           this.isRunning = false;
         }
       });

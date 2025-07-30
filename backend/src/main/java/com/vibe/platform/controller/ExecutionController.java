@@ -9,19 +9,27 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/execute")
-@Tag(name = "Execution Controller", description = "APIs for code execution")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class ExecutionController {
 
     @Autowired
     private ExecutionService executionService;
 
     @PostMapping
-    @Operation(summary = "Execute code", description = "Executes code against test cases without saving submission")
-    public ResponseEntity<ExecutionResponse> execute(@Valid @RequestBody ExecutionRequest request) {
-        return ResponseEntity.ok(executionService.execute(request));
+    public ResponseEntity<ExecutionResponse> execute(@RequestBody ExecutionRequest request) {
+        try {
+            ExecutionResponse response = executionService.execute(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ExecutionResponse.builder()
+                    .status("ERROR")
+                    .error("Failed to execute code: " + e.getMessage())
+                    .build());
+        }
     }
 } 
