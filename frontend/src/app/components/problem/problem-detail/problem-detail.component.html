@@ -19,10 +19,10 @@
             <button mat-icon-button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-200">
               <mat-icon class="text-md">lightbulb</mat-icon>
             </button>
-            <button mat-icon-button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-200">
+            <button mat-icon-button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-200" (click)="onRun()">
               <mat-icon class="text-md">play_arrow</mat-icon>
             </button>
-            <button mat-raised-button class="submit-btn h-10 px-6 bg-teal-500 hover:bg-teal-600 transition-all duration-200 flex items-center">
+            <button mat-raised-button class="submit-btn h-10 px-6 bg-teal-500 hover:bg-teal-600 transition-all duration-200 flex items-center" (click)="onSubmit()">
               <mat-icon class="text-md mr-2">check_circle</mat-icon>
               <span>Submit</span>
             </button>

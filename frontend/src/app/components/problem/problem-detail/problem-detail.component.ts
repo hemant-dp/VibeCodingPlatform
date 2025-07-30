@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
@@ -9,7 +11,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ProblemService, Problem, TestCase } from '../../../services/problem.service';
+import { MatOptionModule } from '@angular/material/core';
+
+import { ProblemService, Problem } from '../../../services/problem.service';
+import { ExecutionService, ExecutionResult } from '../../../services/execution.service';
 
 interface Example {
   input: string;
@@ -26,13 +31,19 @@ interface Example {
     CommonModule,
     FormsModule,
     RouterModule,
+    HttpClientModule,
     MatIconModule,
     MatButtonModule,
     MatSelectModule,
     MatTabsModule,
     MatChipsModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatOptionModule
+  ],
+  providers: [
+    ProblemService,
+    ExecutionService
   ]
 })
 export class ProblemDetailComponent implements OnInit {
@@ -40,11 +51,13 @@ export class ProblemDetailComponent implements OnInit {
   examples: Example[] = [];
   loading = true;
   error: string | null = null;
-
   selectedLanguage = 'C++';
   code = '';
   selectedTabIndex = 0;
-  lineCount = 5; // minimum lines to show
+  lineCount = 5;
+  isRunning = false;
+  executionResult: ExecutionResult | null = null;
+  private currentProblemId: number = 0;
 
   getLineNumbers(): number[] {
     const lines = this.code.split('\n').length;
@@ -77,7 +90,8 @@ public:
 
   constructor(
     private route: ActivatedRoute,
-    private problemService: ProblemService
+    private problemService: ProblemService,
+    private executionService: ExecutionService
   ) {}
 
   ngOnInit() {
@@ -111,8 +125,8 @@ public:
   private processExamples() {
     if (this.problem?.testCases) {
       this.examples = this.problem.testCases
-        .filter((testCase: TestCase) => testCase.isSample)
-        .map((testCase: TestCase) => ({
+        .filter((testCase) => testCase.isSample)
+        .map((testCase) => ({
           input: testCase.input,
           output: testCase.expectedOutput,
           explanation: '' // You can add explanation logic here if needed
@@ -141,23 +155,70 @@ public:
   }
 
   onSubmit() {
+    console.log('Submit button clicked');
     if (!this.problem || !this.code.trim()) {
       console.warn('Cannot submit: missing problem or code');
+      this.error = 'Please write some code before submitting.';
       return;
     }
 
-    console.log('Submitting solution for problem:', this.problem.id);
-    
+    console.log('Submitting solution:', {
+      problemId: this.problem.id,
+      code: this.code,
+      language: this.selectedLanguage
+    });
+
+    this.isRunning = true;
+    this.error = null;
+    this.executionResult = null;
+
     this.problemService.submitSolution(this.problem.id, this.code, this.selectedLanguage).subscribe({
       next: (result) => {
         console.log('Submission successful:', result);
-        // TODO: Handle successful submission (show result, navigate to submissions, etc.)
+        this.executionResult = result;
+        this.isRunning = false;
       },
       error: (err) => {
         console.error('Submission failed:', err);
-        // TODO: Handle submission error
+        this.error = 'Failed to submit solution. Please try again.';
+        this.isRunning = false;
       }
     });
+  }
+
+  onRun() {
+    console.log('Run button clicked');
+    if (!this.problem || !this.code.trim()) {
+      this.error = 'Please write some code before running.';
+      return;
+    }
+
+    console.log('Running code:', {
+      problemId: this.problem.id,
+      code: this.code,
+      language: this.selectedLanguage
+    });
+
+    this.isRunning = true;
+    this.error = null;
+    this.executionResult = null;
+
+    this.executionService.executeCode(this.problem.id, this.code, this.selectedLanguage)
+      .subscribe({
+        next: (result) => {
+          console.log('Execution successful:', result);
+          this.executionResult = result;
+          if (result.status !== 'SUCCESS') {
+            this.error = result.error || `Execution failed: ${result.status}`;
+          }
+          this.isRunning = false;
+        },
+        error: (err) => {
+          console.error('Code execution failed:', err);
+          this.error = 'Failed to execute code. Please try again.';
+          this.isRunning = false;
+        }
+      });
   }
 
   onTabChange(index: number) {
