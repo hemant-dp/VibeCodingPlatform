@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-resources',
   standalone: true,
   template: `
+
     <div class="page-container">
       <h1>Resources</h1>
       <p>This is a dummy Resources page. Add your resources info here.</p>

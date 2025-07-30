@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-about-us',
   standalone: true,
   template: `
+
     <div class="about-container">
       <h1>About Cognizant VibeCoding Platform</h1>
       <p>

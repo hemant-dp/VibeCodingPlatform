@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-developers',
   standalone: true,
   template: `
+
     <div class="page-container">
       <h1>For Developers</h1>
       <p>This is a dummy Developers page. Add your developer info here.</p>

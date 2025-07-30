@@ -24,12 +24,12 @@ export const routes: Routes = [
     loadComponent: () => import('./components/resources/resources.component').then(m => m.ResourcesComponent)
   },
   {
-    path: 'pricing',
-    loadComponent: () => import('./components/pricing/pricing.component').then(m => m.PricingComponent)
-  },
-  {
     path: 'developers',
     loadComponent: () => import('./components/developers/developers.component').then(m => m.DevelopersComponent)
+  },
+  {
+    path: 'our-vision',
+    loadComponent: () => import('./components/our-vision/our-vision.component').then(m => m.OurVisionComponent)
   },
   {
     path: 'selection',
