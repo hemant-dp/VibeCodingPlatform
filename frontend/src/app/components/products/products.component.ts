@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-products',
   standalone: true,
   template: `
+
     <div class="page-container">
       <h1>Products</h1>
       <p>This is a dummy Products page. Add your products info here.</p>

@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-solutions',
   standalone: true,
   template: `
+
     <div class="page-container">
       <h1>Solutions</h1>
       <p>This is a dummy Solutions page. Add your solutions info here.</p>
