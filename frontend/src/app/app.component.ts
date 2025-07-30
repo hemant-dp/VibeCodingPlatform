@@ -33,11 +33,8 @@ import { User } from './services/auth.service';
               <div class="flex items-center">
                 <!-- Logo -->
                 <div class="logo-container">
-  <a routerLink="/" class="logo-link">
-    <!-- If you don't see the logo, check: 1) assets/logo.svg exists, 2) clear cache, 3) open http://localhost:4200/assets/logo.svg directly -->
-<img src="assets/logo.png" alt="Logo" class="hex-logo-only" style="background:transparent;display:block;object-fit:contain;">
-  </a>
-</div>
+                  <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="hex-logo-only" style="background:transparent;display:block;object-fit:contain;">
+                </div>
 
                 <!-- Primary Navigation -->
                 <nav class="main-nav">
@@ -151,10 +148,13 @@ import { User } from './services/auth.service';
     }
 
     .hex-logo-only {
-  height: 42px;
-  width: 42px;
+  height: 80px;
+  width: auto;
+  max-width: 220px;
   display: block;
   transition: filter 0.3s;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
 .logo-link:hover .hex-logo-only {
