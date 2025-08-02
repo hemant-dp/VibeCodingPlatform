@@ -30,6 +30,28 @@ public class ExecutionService {
 
     private final Random random = new Random();
 
+    private boolean isCompilerAvailable(String compiler) {
+        try {
+            ProcessBuilder testBuilder = new ProcessBuilder(compiler, "--version");
+            Process testProcess = testBuilder.start();
+            int exitCode = testProcess.waitFor();
+            return exitCode == 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isPythonAvailable(String pythonCommand) {
+        try {
+            ProcessBuilder testBuilder = new ProcessBuilder(pythonCommand, "--version");
+            Process testProcess = testBuilder.start();
+            int exitCode = testProcess.waitFor();
+            return exitCode == 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private String executeJavaCode(String code) {
         try {
             // Create a temporary directory
@@ -80,10 +102,39 @@ public class ExecutionService {
             // Create executable path
             Path executablePath = tempDir.resolve("solution.exe");
             
-            // Compile the code using g++
-            ProcessBuilder compileBuilder = new ProcessBuilder(
-                "g++", "-std=c++17", "-o", executablePath.toString(), sourcePath.toString()
-            );
+            // Try different C++ compilers in order of preference
+            String[] compilers = {"g++", "gcc", "clang++", "cl"};
+            String selectedCompiler = null;
+            
+            for (String compiler : compilers) {
+                if (isCompilerAvailable(compiler)) {
+                    selectedCompiler = compiler;
+                    break;
+                }
+            }
+            
+            if (selectedCompiler == null) {
+                return "Error: No C++ compiler found. Please install one of: g++, gcc, clang++, or Visual Studio Build Tools.\n" +
+                       "For Windows, you can install:\n" +
+                       "- MinGW-w64: https://www.mingw-w64.org/\n" +
+                       "- Visual Studio Build Tools: https://visualstudio.microsoft.com/downloads/\n" +
+                       "- LLVM/Clang: https://llvm.org/";
+            }
+            
+            // Compile the code using the selected compiler
+            ProcessBuilder compileBuilder;
+            if (selectedCompiler.equals("cl")) {
+                // Microsoft Visual C++ compiler
+                compileBuilder = new ProcessBuilder(
+                    "cl", "/EHsc", "/Fe:" + executablePath.toString(), sourcePath.toString()
+                );
+            } else {
+                // GCC/Clang style compilers
+                compileBuilder = new ProcessBuilder(
+                    selectedCompiler, "-std=c++17", "-o", executablePath.toString(), sourcePath.toString()
+                );
+            }
+            
             Process compileProcess = compileBuilder.start();
             int compileResult = compileProcess.waitFor();
             
@@ -112,6 +163,13 @@ public class ExecutionService {
             
             return output;
         } catch (Exception e) {
+            if (e.getMessage().contains("Cannot run program")) {
+                return "Error: C++ compiler not found. Please install a C++ compiler (g++, gcc, clang++, or Visual Studio Build Tools).\n" +
+                       "Installation options:\n" +
+                       "- MinGW-w64: https://www.mingw-w64.org/\n" +
+                       "- Visual Studio Build Tools: https://visualstudio.microsoft.com/downloads/\n" +
+                       "- LLVM/Clang: https://llvm.org/";
+            }
             return "Error: " + e.getMessage();
         }
     }
@@ -125,8 +183,25 @@ public class ExecutionService {
             Path sourcePath = tempDir.resolve("solution.py");
             Files.write(sourcePath, code.getBytes());
             
+            // Try different Python interpreters
+            String[] pythonCommands = {"python3", "python", "py"};
+            String selectedPython = null;
+            
+            for (String pythonCmd : pythonCommands) {
+                if (isPythonAvailable(pythonCmd)) {
+                    selectedPython = pythonCmd;
+                    break;
+                }
+            }
+            
+            if (selectedPython == null) {
+                return "Error: Python interpreter not found. Please install Python.\n" +
+                       "Download from: https://www.python.org/downloads/\n" +
+                       "Make sure Python is added to your system PATH.";
+            }
+            
             // Run the Python code
-            ProcessBuilder runBuilder = new ProcessBuilder("python3", sourcePath.toString());
+            ProcessBuilder runBuilder = new ProcessBuilder(selectedPython, sourcePath.toString());
             Process runProcess = runBuilder.start();
             
             // Get output and error streams
@@ -144,6 +219,11 @@ public class ExecutionService {
             
             return output;
         } catch (Exception e) {
+            if (e.getMessage().contains("Cannot run program")) {
+                return "Error: Python interpreter not found. Please install Python.\n" +
+                       "Download from: https://www.python.org/downloads/\n" +
+                       "Make sure Python is added to your system PATH.";
+            }
             return "Error: " + e.getMessage();
         }
     }
