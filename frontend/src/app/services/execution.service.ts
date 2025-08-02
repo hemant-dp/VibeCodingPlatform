@@ -24,20 +24,14 @@ export class ExecutionService {
   executeCode(problemId: number, code: string, language: string): Observable<ExecutionResult> {
     const url = `${this.apiUrl}/api/execute`;
     const body = {
-      problemId,
-      code,
-      language
+      problemId: problemId,
+      code: code,
+      language: language
     };
-    
-    // Temporarily disable authorization - no auth headers
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
     
     console.log('Making API call to:', url);
     console.log('Request body:', body);
-    console.log('Headers (no auth):', headers);
     
-    return this.http.post<ExecutionResult>(url, body, { headers });
+    return this.http.post<ExecutionResult>(url, body);
   }
 } 
