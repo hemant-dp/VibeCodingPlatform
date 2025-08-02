@@ -208,6 +208,7 @@ public:
 
     this.isRunning = true;
     this.executionResult = null;
+    this.error = null;
 
     this.executionService.executeCode(this.problem.id, this.code, this.selectedLanguage)
       .subscribe({
@@ -218,10 +219,28 @@ public:
         },
         error: (err) => {
           console.error('Code execution failed:', err);
-          this.executionResult = {
-            status: 'ERROR',
-            error: 'Failed to execute code. Please try again.'
-          };
+          
+          // Handle specific error cases
+          if (err.status === 401) {
+            this.error = 'Authentication required. Please login to run code.';
+            this.executionResult = {
+              status: 'ERROR',
+              error: 'Authentication required. Please login to run code.'
+            };
+          } else if (err.status === 404) {
+            this.error = 'Execute endpoint not found. Please check backend configuration.';
+            this.executionResult = {
+              status: 'ERROR',
+              error: 'Execute endpoint not found.'
+            };
+          } else {
+            this.error = `Failed to execute code: ${err.message || 'Unknown error'}`;
+            this.executionResult = {
+              status: 'ERROR',
+              error: `Failed to execute code: ${err.message || 'Please try again.'}`
+            };
+          }
+          
           this.isRunning = false;
         }
       });

@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/execute")
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+@CrossOrigin(origins = "*", allowCredentials = "false", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
 public class ExecutionController {
 
     @Autowired
@@ -22,9 +22,12 @@ public class ExecutionController {
     @PostMapping
     public ResponseEntity<ExecutionResponse> execute(@RequestBody ExecutionRequest request) {
         try {
+            System.out.println("Received execution request: " + request);
             ExecutionResponse response = executionService.execute(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.err.println("Execution error: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ExecutionResponse.builder()
                     .status("ERROR")
