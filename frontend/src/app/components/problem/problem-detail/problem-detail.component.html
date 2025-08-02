@@ -88,7 +88,7 @@
                 <p class="mb-4 text-gray-700 leading-relaxed">{{problem.description}}</p>
 
                 <!-- Examples -->
-                <div class="mt-8">
+                <div class="mt-8" *ngIf="examples.length > 0; else noExamples">
                   <h3 class="font-semibold text-lg text-[#000033] mb-3">Examples:</h3>
                   <div *ngFor="let example of examples; let i = index" class="mb-6">
                     <h4 class="font-medium text-[#000033] mb-2">Example {{i + 1}}:</h4>
@@ -111,6 +111,15 @@
                     </div>
                   </div>
                 </div>
+                
+                <ng-template #noExamples>
+                  <div class="mt-8">
+                    <h3 class="font-semibold text-lg text-[#000033] mb-3">Examples:</h3>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <p class="text-gray-500 text-center">No sample test cases available for this problem.</p>
+                    </div>
+                  </div>
+                </ng-template>
 
                 <!-- Constraints -->
                 <div class="mt-8">

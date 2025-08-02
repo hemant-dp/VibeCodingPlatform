@@ -128,30 +128,27 @@ public:
   }
 
   private processExamples() {
-    // Always show examples for testing
-    this.examples = [
-      {
-        input: 'nums = [2,7,11,15], target = 9',
-        output: '[0,1]',
-        explanation: 'Because nums[0] + nums[1] = 2 + 7 = 9, we return [0, 1].'
-      },
-      {
-        input: 'nums = [3,2,4], target = 6', 
-        output: '[1,2]',
-        explanation: 'Because nums[1] + nums[2] = 2 + 4 = 6, we return [1, 2].'
-      }
-    ];
-
-    // If we have actual test cases, use those instead
     if (this.problem?.testCases) {
+      // Filter for sample test cases (isSample = true) to show as examples
       const sampleTestCases = this.problem.testCases.filter((testCase) => testCase.isSample);
+      
       if (sampleTestCases.length > 0) {
         this.examples = sampleTestCases.map((testCase, index) => ({
           input: testCase.input,
           output: testCase.expectedOutput,
           explanation: this.generateExplanation(testCase, index + 1)
         }));
+      } else {
+        // If no sample test cases, show first few test cases as examples
+        this.examples = this.problem.testCases.slice(0, 2).map((testCase, index) => ({
+          input: testCase.input,
+          output: testCase.expectedOutput,
+          explanation: this.generateExplanation(testCase, index + 1)
+        }));
       }
+    } else {
+      // No test cases available
+      this.examples = [];
     }
   }
 
@@ -165,30 +162,6 @@ public:
       return `We reverse the order of elements in the input.`;
     }
     return `The algorithm processes the input to produce the expected output.`;
-  }
-
-  private getSampleExamples(): Example[] {
-    // Default examples based on common problem patterns
-    if (this.problem?.title?.toLowerCase().includes('two sum')) {
-      return [
-        {
-          input: 'nums = [2,7,11,15], target = 9',
-          output: '[0,1]',
-          explanation: 'Because nums[0] + nums[1] = 2 + 7 = 9, we return [0, 1].'
-        },
-        {
-          input: 'nums = [3,2,4], target = 6',
-          output: '[1,2]',
-          explanation: 'Because nums[1] + nums[2] = 2 + 4 = 6, we return [1, 2].'
-        },
-        {
-          input: 'nums = [3,3], target = 6',
-          output: '[0,1]',
-          explanation: 'Because nums[0] + nums[1] = 3 + 3 = 6, we return [0, 1].'
-        }
-      ];
-    }
-    return [];
   }
 
   getDifficultyDisplayValue(): string {
