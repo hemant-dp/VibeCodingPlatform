@@ -68,17 +68,108 @@ public class ExecutionService {
         }
     }
 
+    private String executeCppCode(String code) {
+        try {
+            // Create a temporary directory
+            Path tempDir = Files.createTempDirectory("cppexecution");
+            
+            // Create solution.cpp file
+            Path sourcePath = tempDir.resolve("solution.cpp");
+            Files.write(sourcePath, code.getBytes());
+            
+            // Create executable path
+            Path executablePath = tempDir.resolve("solution.exe");
+            
+            // Compile the code using g++
+            ProcessBuilder compileBuilder = new ProcessBuilder(
+                "g++", "-std=c++17", "-o", executablePath.toString(), sourcePath.toString()
+            );
+            Process compileProcess = compileBuilder.start();
+            int compileResult = compileProcess.waitFor();
+            
+            if (compileResult != 0) {
+                String error = new String(compileProcess.getErrorStream().readAllBytes());
+                return "Compilation Error:\n" + error;
+            }
+            
+            // Run the executable
+            ProcessBuilder runBuilder = new ProcessBuilder(executablePath.toString());
+            Process runProcess = runBuilder.start();
+            
+            // Get output and error streams
+            String output = new String(runProcess.getInputStream().readAllBytes());
+            String error = new String(runProcess.getErrorStream().readAllBytes());
+            
+            int runResult = runProcess.waitFor();
+            if (runResult != 0) {
+                return "Runtime Error:\n" + error;
+            }
+            
+            // Clean up temporary files
+            Files.deleteIfExists(sourcePath);
+            Files.deleteIfExists(executablePath);
+            Files.deleteIfExists(tempDir);
+            
+            return output;
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+    private String executePythonCode(String code) {
+        try {
+            // Create a temporary directory
+            Path tempDir = Files.createTempDirectory("pythonexecution");
+            
+            // Create solution.py file
+            Path sourcePath = tempDir.resolve("solution.py");
+            Files.write(sourcePath, code.getBytes());
+            
+            // Run the Python code
+            ProcessBuilder runBuilder = new ProcessBuilder("python3", sourcePath.toString());
+            Process runProcess = runBuilder.start();
+            
+            // Get output and error streams
+            String output = new String(runProcess.getInputStream().readAllBytes());
+            String error = new String(runProcess.getErrorStream().readAllBytes());
+            
+            int runResult = runProcess.waitFor();
+            if (runResult != 0) {
+                return "Runtime Error:\n" + error;
+            }
+            
+            // Clean up temporary files
+            Files.deleteIfExists(sourcePath);
+            Files.deleteIfExists(tempDir);
+            
+            return output;
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
     public ExecutionResponse execute(ExecutionRequest request) {
         try {
             String output;
-            if (request.getLanguage().equals("Java")) {
-                output = executeJavaCode(request.getCode());
-            } else {
-                // Add support for other languages here
-                return ExecutionResponse.builder()
-                    .status("ERROR")
-                    .error("Language not supported: " + request.getLanguage())
-                    .build();
+            String language = request.getLanguage();
+            
+            switch (language.toLowerCase()) {
+                case "java":
+                    output = executeJavaCode(request.getCode());
+                    break;
+                case "c++":
+                case "cpp":
+                    output = executeCppCode(request.getCode());
+                    break;
+                case "python":
+                case "python3":
+                    output = executePythonCode(request.getCode());
+                    break;
+                default:
+                    return ExecutionResponse.builder()
+                        .status("ERROR")
+                        .error("Language not supported: " + language + ". Supported languages: Java, C++, Python")
+                        .build();
             }
             
             return ExecutionResponse.builder()
