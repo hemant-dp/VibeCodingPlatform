@@ -25,7 +25,7 @@ import { User } from './services/auth.service';
   ],
   template: `
     <div class="min-h-screen flex flex-col">
-      @if (!isLandingPage) {
+      @if (!isLandingPage && !isProblemDetailPage) {
         <div class="sticky top-0 z-50 bg-white transition-shadow duration-300" [class.shadow-md]="isScrolled">
           <mat-toolbar class="px-4">
             <div class="container mx-auto flex items-center justify-between h-16">
@@ -33,39 +33,35 @@ import { User } from './services/auth.service';
               <div class="flex items-center">
                 <!-- Logo -->
                 <div class="logo-container">
-                  <a routerLink="/" class="logo-link">
-                    <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="logo-image">
-                  </a>
+                  <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="hex-logo-only" style="background:transparent;display:block;object-fit:contain;">
                 </div>
 
                 <!-- Primary Navigation -->
-                <nav class="hidden lg:flex items-center space-x-1">
-                  <a routerLink="/products" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/products')">
-                    Products
-                  </a>
-                  <a routerLink="/solutions" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/solutions')">
-                    Solutions
-                  </a>
-                  <a routerLink="/resources" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/resources')">
-                    Resources
-                  </a>
-                  <a routerLink="/pricing" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/pricing')">
-                    Pricing
-                  </a>
-                  <a routerLink="/developers" 
-                     class="nav-link"
-                     [class.active]="router.url.includes('/developers')">
-                    For Developers
-                  </a>
-                </nav>
+                <nav class="main-nav">
+  <a routerLink="/" class="nav-link" [class.active]="router.url === '/'">
+    <mat-icon class="nav-icon">home</mat-icon> Home
+  </a>
+  <a routerLink="/problems" class="nav-link" [class.active]="router.url.includes('/problems')">
+    <mat-icon class="nav-icon">rocket_launch</mat-icon> Problems
+  </a>
+  <a routerLink="/developers" class="nav-link" [class.active]="router.url.includes('/developers')">
+    <mat-icon class="nav-icon">code</mat-icon> Developers
+  </a>
+  <a routerLink="/dashboard" class="nav-link" [class.active]="router.url.includes('/dashboard')">
+    <mat-icon class="nav-icon">leaderboard</mat-icon> Dashboard
+     </a>
+     
+  <div class="nav-link help-link" [matMenuTriggerFor]="helpMenu">
+    <mat-icon class="nav-icon">help_outline</mat-icon> Help
+    <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
+  </div>
+  <mat-menu #helpMenu="matMenu" class="help-menu">
+    <button mat-menu-item routerLink="/about"><mat-icon>info</mat-icon> About</button>
+    <button mat-menu-item routerLink="/support"><mat-icon>support_agent</mat-icon> Support</button>
+    <button mat-menu-item routerLink="/faq"><mat-icon>help</mat-icon> FAQ</button>
+    <button mat-menu-item routerLink="/contact"><mat-icon>mail</mat-icon> Contact Us</button>
+  </mat-menu>
+</nav>
               </div>
 
               <!-- Right side with user menu -->
@@ -124,11 +120,23 @@ import { User } from './services/auth.service';
     }
 
     .mat-toolbar {
-      height: 72px;
-      padding: 0;
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
-    }
+  height: 72px;
+  padding: 0;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (max-width: 768px) {
+  .mat-toolbar {
+    height: 60px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mat-toolbar {
+    height: 56px;
+  }
+}
 
     .logo-container {
       margin-left: 24px;
@@ -146,37 +154,171 @@ import { User } from './services/auth.service';
 
     .logo-link:hover {
       transform: scale(1.1);
-      background-color: rgba(0, 51, 161, 0.04);
+      background-color: rgba(0, 13, 161, 0.5);
     }
 
-    .logo-image {
-      height: 40px;
-      width: auto;
-      transition: all 0.3s ease;
-    }
+    .hex-logo-only {
+  height: 80px;
+  width: auto;
+  max-width: 220px;
+  display: block;
+  transition: filter 0.3s;
+  object-fit: contain;
+  vertical-align: middle;
+}
 
-    .logo-link:hover .logo-image {
-      filter: brightness(1.1);
-    }
+.logo-link:hover .hex-logo-only {
+  filter: brightness(1.15) drop-shadow(0 0 8pxrgba(0, 51, 161, 0.45));
+}
 
-    .nav-link {
-      padding: 8px 16px;
-      color: #374151;
-      font-size: 14px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: color 200ms;
-      border-radius: 4px;
-    }
+@media (max-width: 1024px) {
+  .hex-logo-only {
+    height: 60px;
+    max-width: 180px;
+  }
+  
+  .logo-container {
+    margin-left: 16px;
+    margin-right: 24px;
+  }
+}
 
-    .nav-link:hover {
-      color: #0033A1;
-      background-color: rgba(0, 51, 161, 0.04);
-    }
+@media (max-width: 768px) {
+  .hex-logo-only {
+    height: 50px;
+    max-width: 150px;
+  }
+  
+  .logo-container {
+    margin-left: 12px;
+    margin-right: 16px;
+  }
+  
+  .main-nav {
+    gap: 4px;
+    margin-left: 16px;
+  }
+  
+  .nav-link {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  .nav-link .nav-icon {
+    font-size: 16px;
+  }
+}
 
-    .nav-link.active {
-      color: #0033A1;
-      background-color: rgba(0, 51, 161, 0.08);
+@media (max-width: 640px) {
+  .hex-logo-only {
+    height: 40px;
+    max-width: 120px;
+  }
+  
+  .logo-container {
+    margin-left: 8px;
+    margin-right: 12px;
+  }
+  
+  .main-nav {
+    gap: 2px;
+    margin-left: 8px;
+  }
+  
+  .nav-link {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .nav-link .nav-icon {
+    font-size: 14px;
+    margin-right: 1px;
+  }
+}
+
+
+    .main-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 32px;
+}
+
+.nav-link {
+  position: relative;
+  padding: 8px 18px;
+  color: #222b45;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.18s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-link .nav-icon {
+  font-size: 19px;
+  margin-right: 2px;
+  color: inherit;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #fff;
+  background: #16213E;
+  border-radius: 999px;
+  box-shadow: 0 4px 18px 0 #16213e44, 0 0 0 2px #16213ecc;
+  text-shadow: 0 0 8px #16213ecc;
+}
+
+.help-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dropdown-arrow {
+  font-size: 20px;
+  margin-left: 2px;
+}
+
+:host ::ng-deep .help-menu {
+  min-width: 220px;
+  border-radius: 14px !important;
+  box-shadow: 0 6px 32px 0 #0033a133,0 0 0 1px #0033a120;
+  background: #fff;
+  padding: 6px 0;
+}
+
+:host ::ng-deep .help-menu .mat-menu-item {
+  font-size: 15px;
+  color: #0033A1;
+  border-radius: 8px;
+  transition: background 0.16s;
+}
+
+:host ::ng-deep .help-menu .mat-menu-item:hover {
+  background: linear-gradient(90deg, #0033A1 0%, #0056D2 100%);
+  color: #fff;
+}
+
+:host ::ng-deep .help-menu .mat-icon {
+  margin-right: 16px;
+  font-size: 20px;
+  color: inherit;
+}
+
+
+    .nav-icon {
+      font-size: 18px;
+      margin-right: 4px;
+      color: inherit;
+      vertical-align: middle;
     }
 
     .nav-link-auth {
@@ -275,6 +417,7 @@ import { User } from './services/auth.service';
 })
 export class AppComponent implements OnInit {
   isLandingPage = false;
+  isProblemDetailPage = false;
   isScrolled = false;
   currentUser: User | null = null;
 
@@ -291,6 +434,7 @@ export class AppComponent implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.isLandingPage = event.url === '/';
+      this.isProblemDetailPage = event.url.includes('/problems/') && !event.url.endsWith('/problems/');
     });
   }
 

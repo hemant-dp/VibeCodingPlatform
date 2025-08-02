@@ -1,154 +1,312 @@
-<!-- Header -->
-<div class="header bg-white border-b">
-  <div class="container mx-auto px-4 py-2">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center space-x-4">
-        <!-- Problem List Title -->
-        <h1 class="text-xl font-semibold">Problem List</h1>
-        
-        <!-- Navigation Arrows -->
-        <div class="flex space-x-2">
-          <button mat-icon-button routerLink="/problems">
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button mat-icon-button>
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-          <button mat-icon-button>
-            <mat-icon>shuffle</mat-icon>
-          </button>
+  <!-- Header -->
+  <div class="header bg-[#000033] text-white">
+    <div class="container mx-auto px-6 h-16">
+      <div class="flex items-center justify-between h-full">
+        <!-- Left: Logo and Navigation -->
+        <div class="flex items-center">
+          <a routerLink="/problems" class="flex items-center hover:opacity-90 transition-all duration-200">
+            <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-8">
+          </a>
+          <div class="h-8 w-px bg-white/10 mx-4"></div>
+          <!-- <a routerLink="/problems" class="text-white/90 hover:text-white transition-all duration-200"> -->
+            <span class="font-medium tracking-wide uppercase text-sm">Problems List</span>
+          <!-- </a> -->
         </div>
-      </div>
 
-      <!-- Right Side Tools -->
-      <div class="flex items-center space-x-4">
-        <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()">
-          <mat-icon>cloud_upload</mat-icon>
-          <span>Submit</span>
-        </button>
-        <div class="flex items-center space-x-2">
-          <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-8">
-          <span class="text-gray-600">0</span>
-          <span class="text-blue-600 premium-badge">Premium</span>
+        <!-- Center: Action Buttons -->
+        <div class="flex items-center justify-center flex-1 px-4">
+          <div class="flex items-center space-x-4">
+            <button mat-icon-button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-200">
+              <mat-icon class="text-md">lightbulb</mat-icon>
+            </button>
+            <button mat-icon-button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-200" (click)="onRun()">
+              <mat-icon class="text-md">play_arrow</mat-icon>
+            </button>
+            <button mat-raised-button class="submit-btn h-10 px-6 bg-teal-500 hover:bg-teal-600 transition-all duration-200 flex items-center" (click)="onSubmit()">
+              <mat-icon class="text-md mr-2">check_circle</mat-icon>
+              <span>Submit</span>
+            </button>
+            <button mat-icon-button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-200">
+              <mat-icon class="text-md">chat_bubble_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Stats and Settings -->
+        <div class="flex items-center space-x-4">
+          <button mat-icon-button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-200">
+            <mat-icon>apps</mat-icon>
+          </button>
+          <button mat-icon-button class="w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 transition-all duration-200">
+            <mat-icon>settings</mat-icon>
+          </button>
+          <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full">
+            <mat-icon class="text-white text-xl">local_fire_department</mat-icon>
+            <span class="text-white font-medium">0</span>
+          </div>
+          <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full">
+            <mat-icon class="text-white text-xl">timer</mat-icon>
+            <span class="text-white font-medium">0</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Main Content -->
-<div class="container mx-auto px-4 py-4">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="flex justify-center items-center h-64">
-    <mat-spinner></mat-spinner>
-    <span class="ml-4">Loading problem details...</span>
-  </div>
-
-  <!-- Error State -->
-  <div *ngIf="error && !loading" class="flex justify-center items-center h-64">
-    <div class="text-center">
-      <mat-icon class="text-red-500 text-4xl mb-2">error</mat-icon>
-      <p class="text-red-500">{{ error }}</p>
-      <button mat-raised-button color="primary" (click)="loadProblem()" class="mt-4">
-        Retry
-      </button>
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-4">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center h-64">
+      <mat-spinner [diameter]="32" [strokeWidth]="3" color="primary"></mat-spinner>
+      <span class="ml-4 text-gray-600">Loading problem details...</span>
     </div>
-  </div>
 
-  <!-- Content -->
-  <div *ngIf="problem && !loading" class="grid grid-cols-2 gap-4">
-    <!-- Left Panel -->
-    <div class="bg-white rounded-lg shadow">
-      <!-- Tabs -->
-      <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
-        <mat-tab label="Description">
-          <div class="p-6">
-            <h2 class="text-2xl font-bold mb-4">{{problem.id}}. {{problem.title}}</h2>
-            
-            <!-- Difficulty and Tags -->
-            <div class="flex items-center space-x-4 mb-6">
-              <div class="flex flex-wrap gap-2">
-                <mat-chip-option [color]="getDifficultyDisplayValue() === 'Easy' ? 'primary' : getDifficultyDisplayValue() === 'Medium' ? 'accent' : 'warn'">
-                  {{getDifficultyDisplayValue()}}
-                </mat-chip-option>
-                <mat-chip-option *ngFor="let topic of problem.tags">
-                  {{topic}}
-                </mat-chip-option>
-              </div>
-            </div>
-
-            <!-- Problem Description -->
-            <div class="prose max-w-none">
-              <p class="mb-4">{{problem.description}}</p>
-
-              <!-- Examples -->
-              <div class="mt-6" *ngFor="let example of examples; let i = index">
-                <h3 class="font-medium">Example {{i + 1}}:</h3>
-                <div class="bg-gray-50 p-4 rounded-lg mt-2">
-                  <p><strong>Input:</strong> {{example.input}}</p>
-                  <p><strong>Output:</strong> {{example.output}}</p>
-                  <p *ngIf="example.explanation"><strong>Explanation:</strong> {{example.explanation}}</p>
+    <!-- Content -->
+    <div *ngIf="problem && !loading" class="grid grid-cols-2 gap-6">
+      <!-- Left Panel -->
+      <div class="bg-white rounded-xl shadow-sm">
+        <!-- Tabs -->
+        <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
+          <mat-tab label="Description">
+            <div class="p-6">
+              <h2 class="text-2xl font-bold mb-4 text-[#000033]">{{problem.id}}. {{problem.title}}</h2>
+              
+              <!-- Difficulty and Tags -->
+              <div class="flex items-center space-x-4 mb-6">
+                <div class="flex flex-wrap gap-2">
+                  <mat-chip-option [color]="getDifficultyDisplayValue() === 'Easy' ? 'primary' : getDifficultyDisplayValue() === 'Medium' ? 'accent' : 'warn'">
+                    {{getDifficultyDisplayValue()}}
+                  </mat-chip-option>
+                  <mat-chip-option *ngFor="let topic of problem.tags">
+                    {{topic}}
+                  </mat-chip-option>
                 </div>
               </div>
 
-              <!-- Constraints -->
-              <div class="mt-6" *ngIf="problem.constraints">
-                <h3 class="font-medium">Constraints:</h3>
-                <div class="bg-gray-50 p-4 rounded-lg mt-2">
-                  <p>{{problem.constraints}}</p>
+              <!-- Problem Description -->
+              <div class="prose max-w-none">
+                <p class="mb-4 text-gray-700 leading-relaxed">{{problem.description}}</p>
+
+                <!-- Examples -->
+                <div class="mt-8" *ngIf="examples.length > 0; else noExamples">
+                  <h3 class="font-semibold text-lg text-[#000033] mb-3">Examples:</h3>
+                  <div *ngFor="let example of examples; let i = index" class="mb-6">
+                    <h4 class="font-medium text-[#000033] mb-2">Example {{i + 1}}:</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
+                      <div>
+                        <span class="font-semibold text-[#000033]">Input:</span>
+                        <br>
+                        <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{{example.input}}</code>
+                      </div>
+                      <div>
+                        <span class="font-semibold text-[#000033]">Output:</span>
+                        <br>
+                        <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{{example.output}}</code>
+                      </div>
+                      <div *ngIf="example.explanation">
+                        <span class="font-semibold text-[#000033]">Explanation:</span>
+                        <br>
+                        <span class="text-gray-700">{{example.explanation}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <ng-template #noExamples>
+                  <div class="mt-8">
+                    <h3 class="font-semibold text-lg text-[#000033] mb-3">Examples:</h3>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <p class="text-gray-500 text-center">No sample test cases available for this problem.</p>
+                    </div>
+                  </div>
+                </ng-template>
+
+                <!-- Constraints -->
+                <div class="mt-8">
+                  <h3 class="font-semibold text-lg text-[#000033] mb-3">Constraints:</h3>
+                  <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div *ngIf="problem.constraints; else defaultConstraints">
+                      <ul class="space-y-2 text-gray-700">
+                        <li *ngFor="let constraint of problem.constraints.split('\n')" class="flex items-start">
+                          <span class="text-[#000033] mr-2">•</span>
+                          <span class="text-sm">{{constraint}}</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <ng-template #defaultConstraints>
+                      <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start">
+                          <span class="text-[#000033] mr-2">•</span>
+                          <span class="text-sm">2 ≤ nums.length ≤ 10^4</span>
+                        </li>
+                        <li class="flex items-start">
+                          <span class="text-[#000033] mr-2">•</span>
+                          <span class="text-sm">-10^9 ≤ nums[i] ≤ 10^9</span>
+                        </li>
+                        <li class="flex items-start">
+                          <span class="text-[#000033] mr-2">•</span>
+                          <span class="text-sm">-10^9 ≤ target ≤ 10^9</span>
+                        </li>
+                        <li class="flex items-start">
+                          <span class="text-[#000033] mr-2">•</span>
+                          <span class="text-sm">Only one valid answer exists.</span>
+                        </li>
+                      </ul>
+                    </ng-template>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Editorial">
-          <div class="p-6">
-            <p class="text-gray-500">Editorial content coming soon...</p>
-          </div>
-        </mat-tab>
-        <mat-tab label="Solutions">
-          <div class="p-6">
-            <p class="text-gray-500">Community solutions will appear here...</p>
-          </div>
-        </mat-tab>
-        <mat-tab label="Submissions">
-          <div class="p-6">
-            <p class="text-gray-500">Your submissions will appear here...</p>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-    </div>
-
-    <!-- Right Panel - Code Editor -->
-    <div class="bg-white rounded-lg shadow">
-      <div class="border-b p-4">
-        <mat-form-field appearance="outline" class="w-32">
-          <mat-label>Language</mat-label>
-          <mat-select [(value)]="selectedLanguage" (selectionChange)="onLanguageChange($event.value)">
-            <mat-option value="C++">C++</mat-option>
-            <mat-option value="Java">Java</mat-option>
-            <mat-option value="Python">Python</mat-option>
-            <mat-option value="JavaScript">JavaScript</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      
-      <!-- Code Editor Area -->
-      <div class="p-4 h-[600px] bg-gray-50">
-        <textarea [(ngModel)]="code"
-                  class="w-full h-full font-mono p-4 bg-white border rounded"
-                  placeholder="Write your code here..."></textarea>
+          </mat-tab>
+          <mat-tab label="Editorial">
+            <div class="p-6">
+              <div class="flex items-center justify-center h-64">
+                <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-12 opacity-20">
+              </div>
+              <p class="text-center text-gray-500">Editorial content coming soon...</p>
+            </div>
+          </mat-tab>
+          <mat-tab label="Solutions">
+            <div class="p-6">
+              <div class="flex items-center justify-center h-64">
+                <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-12 opacity-20">
+              </div>
+              <p class="text-center text-gray-500">Community solutions will appear here...</p>
+            </div>
+          </mat-tab>
+          <mat-tab label="Submissions">
+            <div class="p-6">
+              <div class="flex items-center justify-center h-64">
+                <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="h-12 opacity-20">
+              </div>
+              <p class="text-center text-gray-500">Your submissions will appear here...</p>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
       </div>
 
-      <!-- Submit Button -->
-      <div class="p-4 border-t">
-        <button mat-raised-button 
-                color="primary"
-                class="w-full"
-                (click)="onSubmit()">
-          Submit
-        </button>
+      <!-- Right Panel - Code Editor -->
+      <div class="bg-white rounded-xl shadow-sm">
+        <!-- Code Header -->
+        <div class="border-b p-2 flex items-center">
+          <span class="text-green-600 font-mono mr-2">&lt;/&gt;</span>
+          <span class="text-gray-700">Code</span>
+          <div class="ml-auto flex gap-2">
+            <button mat-icon-button class="text-gray-500">
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+            <button mat-icon-button class="text-gray-500">
+              <mat-icon>keyboard_arrow_up</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="border-b p-2 flex items-center justify-between bg-gray-50">
+          <div class="flex items-center gap-2">
+            <mat-form-field appearance="outline" class="w-28 toolbar-select">
+              <mat-select [(value)]="selectedLanguage" (selectionChange)="onLanguageChange($event.value)">
+                <mat-option value="C++">
+                  <span class="font-medium">C++</span>
+                </mat-option>
+                <mat-option value="Java">
+                  <span class="font-medium">Java</span>
+                </mat-option>
+                <mat-option value="Python">
+                  <span class="font-medium">Python</span>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <!-- <span class="text-gray-400">|</span> -->
+            <!-- <mat-icon class="text-gray-500 text-md">lock</mat-icon> -->
+            <!-- <span class="text-gray-600 text-sm">Auto</span> -->
+          </div>
+          <div class="flex items-center gap-2">
+            <button mat-icon-button class="text-gray-500">
+              <mat-icon>menu</mat-icon>
+            </button>
+            <button mat-icon-button class="text-gray-500">
+              <mat-icon>bookmark_border</mat-icon>
+            </button>
+            <button mat-icon-button class="text-gray-500">
+              <mat-icon>sync</mat-icon>
+            </button>
+            <button mat-icon-button class="text-gray-500">
+              <mat-icon>undo</mat-icon>
+            </button>
+            <button mat-icon-button class="text-gray-500">
+              <mat-icon>open_in_full</mat-icon>
+            </button>
+          </div>
+        </div>
+        <hr>
+        <!-- Code Editor Area -->
+        <div class="h-[500px] bg-white flex">
+          <!-- Line Numbers -->
+          <div class="line-numbers bg-[#F8FAFC] border-r border-[#E2E8F0] py-4 select-none">
+            <div *ngFor="let number of getLineNumbers()" 
+                 class="text-[#64748B] text-right px-4 font-mono text-sm leading-6">
+              {{number}}
+            </div>
+          </div>
+          
+          <!-- Code Area -->
+          <div class="flex-1">
+            <textarea [(ngModel)]="code"
+                      class="w-full h-full font-mono text-sm p-4 border-none focus:outline-none leading-6"
+                      placeholder="Write your code here..."
+                      (ngModelChange)="onCodeChange($event)"></textarea>
+          </div>
+        </div>
+
+        <!-- Test Results Section -->
+        <div class="border-t">
+          <!-- Test Header -->
+          <div class="flex items-center p-2 bg-gray-50 border-b">
+            <div class="flex items-center gap-2">
+              <mat-icon [class]="executionResult?.status === 'SUCCESS' ? 'text-green-600' : 'text-red-600'">
+                {{executionResult?.status === 'SUCCESS' ? 'check_circle' : 'error'}}
+              </mat-icon>
+              <span class="text-gray-600">Test Results</span>
+            </div>
+          </div>
+
+          <!-- Test Results Content -->
+          <div class="p-4">
+            <!-- Loading State -->
+            <div *ngIf="isRunning" class="flex items-center justify-center p-4">
+              <mat-spinner [diameter]="24"></mat-spinner>
+              <span class="ml-3 text-gray-600">Running code...</span>
+            </div>
+
+            <!-- Error State -->
+            <div *ngIf="error" class="bg-red-50 p-4 rounded-lg">
+              <div class="font-medium text-red-700 mb-2">Error</div>
+              <pre class="bg-red-100 p-3 rounded text-red-700 font-mono text-sm whitespace-pre-wrap">{{error}}</pre>
+            </div>
+
+            <!-- Compilation Error -->
+            <div *ngIf="executionResult?.status === 'COMPILATION_ERROR'" class="bg-red-50 p-4 rounded-lg">
+              <div class="font-medium text-red-700 mb-2">Compilation Error</div>
+              <pre class="bg-red-100 p-3 rounded text-red-700 font-mono text-sm whitespace-pre-wrap">{{executionResult?.error}}</pre>
+            </div>
+
+            <!-- Runtime Error -->
+            <div *ngIf="executionResult?.status === 'RUNTIME_ERROR'" class="bg-red-50 p-4 rounded-lg">
+              <div class="font-medium text-red-700 mb-2">Runtime Error</div>
+              <pre class="bg-red-100 p-3 rounded text-red-700 font-mono text-sm whitespace-pre-wrap">{{executionResult?.error}}</pre>
+            </div>
+
+            <!-- Success Results -->
+            <div *ngIf="executionResult?.status === 'SUCCESS'" class="bg-green-50 p-4 rounded-lg">
+              <div class="flex items-center gap-2 mb-4">
+                <mat-icon class="text-green-600">check_circle</mat-icon>
+                <span class="font-medium text-green-700">Program Output</span>
+              </div>
+              <pre class="bg-green-100 p-3 rounded text-green-700 font-mono text-sm whitespace-pre-wrap">{{executionResult?.output}}</pre>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>

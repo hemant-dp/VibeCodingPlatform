@@ -2,17 +2,28 @@
   display: block;
   min-height: 100vh;
   background-color: #f3f4f6;
+  overflow-x: hidden;
 }
 
 .header {
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .container {
   max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Fix grid layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Typography */
@@ -30,18 +41,129 @@
   margin-bottom: 0.5rem;
 }
 
-/* Code Editor */
+/* Code editor textarea */
 textarea {
-  resize: none;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 24px;
+  resize: none;
+  padding: 12px !important;
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* Line Numbers */
+.line-numbers {
+  min-width: 3.5rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 14px;
+  background-color: #F8FAFC;
+  border-right: 1px solid #E2E8F0;
+}
+
+.line-numbers div {
+  height: 24px;
+  line-height: 24px;
+  color: #64748B;
+  user-select: none;
+}
+
+.line-numbers div:hover {
+  background-color: #F1F5F9;
+}
+
+/* Code Area Container */
+.code-container {
+  position: relative;
+  height: 100%;
+  background-color: white;
+}
+
+/* Code Editor Area */
+.h-\[500px\] {
+  margin-right: 5rem;
+}
+
+/* Toolbar select field */
+.toolbar-select {
+  margin-bottom: -1.25em; /* Remove bottom margin from mat-form-field */
+}
+
+.toolbar-select ::ng-deep .mat-mdc-form-field-flex {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 8px;
+  background-color: transparent !important;
+}
+
+.toolbar-select ::ng-deep .mat-mdc-form-field-infix {
+  padding: 6px 0;
+  width: auto;
+}
+
+.toolbar-select ::ng-deep .mdc-notched-outline {
+  display: none;
+}
+
+/* Icon buttons in toolbar */
+[mat-icon-button] {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  padding: 2px;
+}
+
+[mat-icon-button] mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+}
+
+/* Test Results Section */
+.test-header mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+
+/* Error message */
+.error-message {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  white-space: pre-wrap;
   tab-size: 4;
 }
 
 /* Material Overrides */
 .mat-mdc-tab-group {
   height: 100%;
+}
+
+:host ::ng-deep .mat-mdc-tab-header {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+:host ::ng-deep .mat-mdc-tab {
+  min-width: 120px;
+  padding: 0 24px;
+}
+
+:host ::ng-deep .mat-mdc-tab-label-content {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+:host ::ng-deep .mdc-tab--active .mat-mdc-tab-label-content {
+  color: #000033;
+}
+
+:host ::ng-deep .mat-mdc-tab-header-pagination-chevron {
+  border-color: #000033;
+}
+
+:host ::ng-deep .mat-mdc-tab-body-content {
+  overflow: auto;
 }
 
 .mat-mdc-chip.mat-mdc-standard-chip {
@@ -57,20 +179,74 @@ textarea {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #0033A1 !important;
+  background-color: #00B3B3 !important;
+  border-radius: 4px;
+  padding: 0 16px;
+  height: 32px;
+  line-height: 32px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  transition: all 200ms ease;
 }
 
 .submit-btn:hover {
-  background-color: #002a87 !important;
+  background-color: #009999 !important;
+  transform: translateY(-1px);
 }
 
-/* Premium Badge */
-.premium-badge {
-  font-weight: 600;
-  background: linear-gradient(45deg, #FFD700, #FFA500);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+.submit-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.submit-btn-large {
+  background-color: #000033 !important;
+  color: white;
+  height: 44px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  border-radius: 8px;
+  transition: all 200ms ease;
+}
+
+.submit-btn-large:hover {
+  background-color: #000066 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Icon Buttons */
+:host ::ng-deep .mat-mdc-icon-button {
+  --mdc-icon-button-state-layer-size: 32px;
+  padding: 4px;
+  width: 32px;
+  height: 32px;
+  transition: all 200ms ease;
+}
+
+:host ::ng-deep .mat-mdc-icon-button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Form Fields */
+:host ::ng-deep .mat-mdc-form-field {
+  font-size: 14px;
+}
+
+:host ::ng-deep .mat-mdc-form-field-infix {
+  min-height: 40px;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+}
+
+:host ::ng-deep .mat-mdc-form-field-focus-overlay {
+  background-color: white;
 }
 
 /* Custom Scrollbar */
@@ -101,5 +277,124 @@ textarea {
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  textarea {
+    font-size: 13px;
+    line-height: 20px;
+  }
+  
+  .line-numbers {
+    min-width: 2.5rem;
+    font-size: 13px;
+  }
+  
+  .line-numbers div {
+    height: 20px;
+    line-height: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    width: 100%;
+    margin: 0;
+  }
+  
+  textarea {
+    font-size: 12px;
+    line-height: 18px;
+    padding: 8px !important;
+  }
+  
+  .line-numbers {
+    min-width: 2rem;
+    font-size: 12px;
+  }
+  
+  .line-numbers div {
+    height: 18px;
+    line-height: 18px;
+  }
+  
+  :host ::ng-deep .mat-mdc-tab {
+    min-width: 80px;
+    padding: 0 12px;
+  }
+  
+  :host ::ng-deep .mat-mdc-tab-label-content {
+    font-size: 12px;
+  }
+  
+  .submit-btn {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  
+  .submit-btn-large {
+    height: 36px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    width: 100%;
+    margin: 0;
+  }
+  
+  textarea {
+    font-size: 11px;
+    line-height: 16px;
+    padding: 6px !important;
+  }
+  
+  .line-numbers {
+    min-width: 1.5rem;
+    font-size: 11px;
+  }
+  
+  .line-numbers div {
+    height: 16px;
+    line-height: 16px;
+  }
+  
+  :host ::ng-deep .mat-mdc-tab {
+    min-width: 60px;
+    padding: 0 8px;
+  }
+  
+  :host ::ng-deep .mat-mdc-tab-label-content {
+    font-size: 11px;
+  }
+  
+  .submit-btn {
+    height: 24px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+  
+  .submit-btn-large {
+    height: 32px;
+    font-size: 13px;
+  }
+  
+  [mat-icon-button] {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+  }
+  
+  [mat-icon-button] mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
   }
 } 
