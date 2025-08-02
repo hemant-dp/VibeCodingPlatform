@@ -2,6 +2,7 @@
   display: block;
   min-height: 100vh;
   background-color: #f3f4f6;
+  overflow-x: hidden;
 }
 
 .header {
@@ -12,6 +13,17 @@
 
 .container {
   max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Fix grid layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Typography */
@@ -65,6 +77,11 @@ textarea {
   position: relative;
   height: 100%;
   background-color: white;
+}
+
+/* Code Editor Area */
+.h-\[500px\] {
+  margin-right: 5rem;
 }
 
 /* Toolbar select field */
@@ -260,5 +277,124 @@ textarea {
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  textarea {
+    font-size: 13px;
+    line-height: 20px;
+  }
+  
+  .line-numbers {
+    min-width: 2.5rem;
+    font-size: 13px;
+  }
+  
+  .line-numbers div {
+    height: 20px;
+    line-height: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    width: 100%;
+    margin: 0;
+  }
+  
+  textarea {
+    font-size: 12px;
+    line-height: 18px;
+    padding: 8px !important;
+  }
+  
+  .line-numbers {
+    min-width: 2rem;
+    font-size: 12px;
+  }
+  
+  .line-numbers div {
+    height: 18px;
+    line-height: 18px;
+  }
+  
+  :host ::ng-deep .mat-mdc-tab {
+    min-width: 80px;
+    padding: 0 12px;
+  }
+  
+  :host ::ng-deep .mat-mdc-tab-label-content {
+    font-size: 12px;
+  }
+  
+  .submit-btn {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  
+  .submit-btn-large {
+    height: 36px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    width: 100%;
+    margin: 0;
+  }
+  
+  textarea {
+    font-size: 11px;
+    line-height: 16px;
+    padding: 6px !important;
+  }
+  
+  .line-numbers {
+    min-width: 1.5rem;
+    font-size: 11px;
+  }
+  
+  .line-numbers div {
+    height: 16px;
+    line-height: 16px;
+  }
+  
+  :host ::ng-deep .mat-mdc-tab {
+    min-width: 60px;
+    padding: 0 8px;
+  }
+  
+  :host ::ng-deep .mat-mdc-tab-label-content {
+    font-size: 11px;
+  }
+  
+  .submit-btn {
+    height: 24px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+  
+  .submit-btn-large {
+    height: 32px;
+    font-size: 13px;
+  }
+  
+  [mat-icon-button] {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+  }
+  
+  [mat-icon-button] mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
   }
 } 

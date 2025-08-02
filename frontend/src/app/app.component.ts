@@ -49,10 +49,8 @@ import { User } from './services/auth.service';
   </a>
   <a routerLink="/dashboard" class="nav-link" [class.active]="router.url.includes('/dashboard')">
     <mat-icon class="nav-icon">leaderboard</mat-icon> Dashboard
-  </a>
-  <a routerLink="/our-vision" class="nav-link" [class.active]="router.url.includes('/our-vision')">
-    <mat-icon class="nav-icon">groups</mat-icon> Our Vision
-  </a>
+     </a>
+     
   <div class="nav-link help-link" [matMenuTriggerFor]="helpMenu">
     <mat-icon class="nav-icon">help_outline</mat-icon> Help
     <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
@@ -128,6 +126,18 @@ import { User } from './services/auth.service';
   border-bottom: 1px solid #e5e7eb;
 }
 
+@media (max-width: 768px) {
+  .mat-toolbar {
+    height: 60px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mat-toolbar {
+    height: 56px;
+  }
+}
+
     .logo-container {
       margin-left: 24px;
       margin-right: 48px;
@@ -159,6 +169,71 @@ import { User } from './services/auth.service';
 
 .logo-link:hover .hex-logo-only {
   filter: brightness(1.15) drop-shadow(0 0 8pxrgba(0, 51, 161, 0.45));
+}
+
+@media (max-width: 1024px) {
+  .hex-logo-only {
+    height: 60px;
+    max-width: 180px;
+  }
+  
+  .logo-container {
+    margin-left: 16px;
+    margin-right: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hex-logo-only {
+    height: 50px;
+    max-width: 150px;
+  }
+  
+  .logo-container {
+    margin-left: 12px;
+    margin-right: 16px;
+  }
+  
+  .main-nav {
+    gap: 4px;
+    margin-left: 16px;
+  }
+  
+  .nav-link {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  .nav-link .nav-icon {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hex-logo-only {
+    height: 40px;
+    max-width: 120px;
+  }
+  
+  .logo-container {
+    margin-left: 8px;
+    margin-right: 12px;
+  }
+  
+  .main-nav {
+    gap: 2px;
+    margin-left: 8px;
+  }
+  
+  .nav-link {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .nav-link .nav-icon {
+    font-size: 14px;
+    margin-right: 1px;
+  }
 }
 
 
