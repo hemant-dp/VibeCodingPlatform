@@ -15,6 +15,7 @@ import { MatOptionModule } from '@angular/material/core';
 
 import { ProblemService, Problem } from '../../../services/problem.service';
 import { ExecutionService, ExecutionResult } from '../../../services/execution.service';
+import { SubmissionService } from '../../../services/submission.service';
 
 interface Example {
   input: string;
@@ -44,7 +45,8 @@ interface Example {
   ],
   providers: [
     ProblemService,
-    ExecutionService
+    ExecutionService,
+    SubmissionService
   ]
 })
 export class ProblemDetailComponent implements OnInit {
@@ -92,7 +94,8 @@ public:
   constructor(
     private route: ActivatedRoute,
     private problemService: ProblemService,
-    private executionService: ExecutionService
+    private executionService: ExecutionService,
+    private submissionService: SubmissionService
   ) {}
 
   ngOnInit() {
@@ -203,17 +206,58 @@ public:
     this.isRunning = true;
     this.executionResult = null;
 
-    this.problemService.submitSolution(this.problem.id, this.code, this.selectedLanguage).subscribe({
-      next: (result) => {
-        console.log('Submission successful:', result);
-        this.executionResult = result;
+    // Map frontend language names to backend enum values
+    const languageMapping: { [key: string]: string } = {
+      'C++': 'CPP',
+      'Java': 'JAVA',
+      'Python': 'PYTHON'
+    };
+
+    const backendLanguage = languageMapping[this.selectedLanguage] || this.selectedLanguage;
+
+    // Create submission request
+    const submissionRequest = {
+      problemId: this.problem.id,
+      code: this.code,
+      language: backendLanguage
+    };
+
+    this.submissionService.submit(submissionRequest).subscribe({
+      next: (submission) => {
+        console.log('Submission successful:', submission);
+        
+        if (submission && submission.id) {
+          this.executionResult = {
+            status: 'SUCCESS',
+            output: `Submission successful! 
+ID: ${submission.id}
+Status: ${submission.status || 'PENDING'}
+Language: ${submission.language || backendLanguage}
+Submitted at: ${submission.submittedAt ? new Date(submission.submittedAt).toLocaleString() : new Date().toLocaleString()}
+
+Your solution has been submitted and is being judged. You can view the results in your submissions.`
+          };
+        } else {
+          this.executionResult = {
+            status: 'SUCCESS',
+            output: 'Submission successful! Your solution has been submitted and is being judged.'
+          };
+        }
         this.isRunning = false;
       },
       error: (err) => {
         console.error('Submission failed:', err);
+        let errorMessage = 'Failed to submit solution. Please try again.';
+        
+        if (err.error && err.error.message) {
+          errorMessage = err.error.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
         this.executionResult = {
           status: 'ERROR',
-          error: 'Failed to submit solution. Please try again.'
+          error: errorMessage
         };
         this.isRunning = false;
       }
@@ -235,7 +279,18 @@ public:
     this.executionResult = null;
     this.error = null;
 
-    this.executionService.executeCode(this.problem.id, this.code, this.selectedLanguage)
+    // Map frontend language names to backend expected values
+    const executionLanguageMapping: { [key: string]: string } = {
+      'C++': 'c++',
+      'Java': 'java',
+      'Python': 'python'
+    };
+
+    const backendLanguage = executionLanguageMapping[this.selectedLanguage] || this.selectedLanguage.toLowerCase();
+
+    console.log('Executing code with language:', backendLanguage);
+
+    this.executionService.executeCode(this.problem.id, this.code, backendLanguage)
       .subscribe({
         next: (result) => {
           console.log('Execution successful:', result);
