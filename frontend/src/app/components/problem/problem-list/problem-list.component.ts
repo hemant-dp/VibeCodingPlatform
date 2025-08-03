@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
@@ -11,16 +11,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
-import { ProblemService } from '../../../services/problem.service';
-
-interface Problem {
-  id: number;
-  title: string;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  tags: string[];
-  acceptanceRate: number;
-  solved: boolean;
-}
+import { Subscription } from 'rxjs';
+import { ProblemService, Problem } from '../../../services/problem.service';
+import { ProblemStateService } from '../../../services/problem-state.service';
 
 @Component({
   selector: 'app-problem-list',
@@ -187,13 +180,14 @@ interface Problem {
     }
   `]
 })
-export class ProblemListComponent implements OnInit {
+export class ProblemListComponent implements OnInit, OnDestroy {
   // All problems
   problems: Problem[] = [];
   // Filtered problems (for display)
   filteredProblems: Problem[] = [];
   loading = true;
   displayedColumns = ['status', 'title', 'difficulty', 'tags', 'acceptanceRate'];
+  private subscriptions = new Subscription();
   
   // Filters
   searchTerm = '';
@@ -304,29 +298,43 @@ export class ProblemListComponent implements OnInit {
     }
   ];
 
-  constructor(private problemService: ProblemService) {}
+  constructor(
+    private problemService: ProblemService,
+    private problemStateService: ProblemStateService
+  ) {}
 
   ngOnInit() {
+    this.loadProblems();
+    
+    // Subscribe to problem state changes for real-time updates
+    this.subscriptions.add(
+      this.problemStateService.problemSolved$.subscribe(event => {
+        if (event && event.problemId > 0 && event.solved) {
+          // A problem was solved, refresh the list
+          this.refreshProblems();
+        }
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+
+  // Public method to refresh problems - can be called from other components
+  refreshProblems() {
     this.loadProblems();
   }
 
   private loadProblems() {
     this.loading = true;
     
-    // Use mock data instead of API call
-    // this.problems = this.mockProblems;
-    // this.applyFilters();
-    // this.loading = false;
-    
-    // Keep this commented out for now, but it's the original API call
-    
     this.problemService.getAllProblems().subscribe({
       next: (problems) => {
         this.problems = problems.map(p => ({
-          
           ...p,
-          acceptanceRate: 0, // This should be calculated from submissions
-          solved: false // This should be determined by user's submissions
+          acceptanceRate: p.acceptanceRate || 0,
+          solved: p.solved || false
         }));
         this.applyFilters();
         this.loading = false;
@@ -339,7 +347,6 @@ export class ProblemListComponent implements OnInit {
         this.loading = false;
       }
     });
-    
   }
   
   // Apply filters to problems

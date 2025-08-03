@@ -12,6 +12,8 @@ export interface Problem {
   inputFormat?: string;
   outputFormat?: string;
   tags: string[];
+  acceptanceRate?: number;
+  solved?: boolean;
   createdAt?: string;
   testCases?: TestCase[];
 }
