@@ -1,6 +1,11 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import {
+  RouterLink,
+  RouterOutlet,
+  Router,
+  NavigationEnd,
+} from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,77 +26,128 @@ import { User } from './services/auth.service';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   template: `
     <div class="min-h-screen flex flex-col">
       @if (!isLandingPage && !isProblemDetailPage) {
-        <div class="sticky top-0 z-50 bg-white transition-shadow duration-300" [class.shadow-md]="isScrolled">
-          <mat-toolbar class="px-4">
-            <div class="container mx-auto flex items-center justify-between h-16">
-              <!-- Left side: Logo and primary navigation -->
-              <div class="flex items-center">
-                <!-- Logo -->
-                <div class="logo-container">
-                  <img src="assets/cognizant-logo.png" alt="Cognizant Logo" class="hex-logo-only" style="background:transparent;display:block;object-fit:contain;">
-                </div>
-
-                <!-- Primary Navigation -->
-                <!-- Hamburger menu toggle for mobile -->
-<button mat-icon-button class="mobile-nav-toggle" (click)="toggleNav()" aria-label="Toggle navigation">
-  <mat-icon>{{ showMobileNav ? 'close' : 'menu' }}</mat-icon>
-</button>
-
-<!-- Desktop nav -->
-<nav class="main-nav" [ngClass]="{ 'mobile-open': showMobileNav }">
-  <a routerLink="/" class="nav-link" [class.active]="router.url === '/'">
-    <mat-icon class="nav-icon">home</mat-icon> Home
-  </a>
-  <a routerLink="/problems" class="nav-link" [class.active]="router.url.includes('/problems')">
-    <mat-icon class="nav-icon">rocket_launch</mat-icon> Problems
-  </a>
-  <a routerLink="/developers" class="nav-link" [class.active]="router.url.includes('/developers')">
-    <mat-icon class="nav-icon">code</mat-icon> Developers
-  </a>
-  <a routerLink="/dashboard" class="nav-link" [class.active]="router.url.includes('/dashboard')">
-    <mat-icon class="nav-icon">leaderboard</mat-icon> Dashboard
-  </a>
-  <div class="nav-link help-link" [matMenuTriggerFor]="helpMenu">
-    <mat-icon class="nav-icon">help_outline</mat-icon> Help
-    <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
-  </div>
-  <mat-menu #helpMenu="matMenu" class="help-menu">
-    <button mat-menu-item routerLink="/about"><mat-icon>info</mat-icon> About</button>
-    <button mat-menu-item routerLink="/support"><mat-icon>support_agent</mat-icon> Support</button>
-    <button mat-menu-item routerLink="/faq"><mat-icon>help</mat-icon> FAQ</button>
-    <button mat-menu-item routerLink="/contact"><mat-icon>mail</mat-icon> Contact Us</button>
-  </mat-menu>
-</nav>
+      <div
+        class="sticky flex max-w-full box-border top-0 z-50 bg-white transition-shadow duration-300"
+        [class.shadow-md]="isScrolled"
+      >
+        <mat-toolbar class="px-4 box-border h-fit">
+          <div class="w-full mx-auto flex items-center justify-between">
+            <!-- Left side: Logo and primary navigation -->
+            <div class="flex items-center w-full max-[999px]:justify-between">
+              <!-- Logo -->
+              <div class="pr-[1%] pl-[1%]">
+                <img
+                  src="assets/cognizant-logo.png"
+                  alt="Cognizant Logo"
+                  class="hex-logo-only"
+                  style="background:transparent;display:block;object-fit:contain;"
+                />
               </div>
 
-              <!-- Right side with user menu -->
-              <div class="flex items-center space-x-4">
-                @if (isAuthenticated()) {
-                  <button mat-button [matMenuTriggerFor]="userMenu" 
-                          class="user-button">
+              <!-- Primary Navigation -->
+              <!-- Hamburger menu toggle for mobile -->
+              <button
+                mat-icon-button
+                class="mobile-nav-toggle"
+                (click)="toggleNav()"
+                aria-label="Toggle navigation"
+              >
+                <mat-icon>{{ showMobileNav ? 'close' : 'menu' }}</mat-icon>
+              </button>
+
+              <!-- Desktop nav -->
+              <nav
+                class="main-nav"
+                [ngClass]="{ 'mobile-open': showMobileNav }"
+              >
+                <a
+                  routerLink="/"
+                  class="nav-link"
+                  [class.active]="router.url === '/'"
+                >
+                  <mat-icon class="nav-icon">home</mat-icon> Home
+                </a>
+                <a
+                  routerLink="/problems"
+                  class="nav-link"
+                  [class.active]="router.url.includes('/problems')"
+                >
+                  <mat-icon class="nav-icon">rocket_launch</mat-icon> Problems
+                </a>
+                <a
+                  routerLink="/developers"
+                  class="nav-link"
+                  [class.active]="router.url.includes('/developers')"
+                >
+                  <mat-icon class="nav-icon">code</mat-icon> Developers
+                </a>
+                <a
+                  routerLink="/dashboard"
+                  class="nav-link"
+                  [class.active]="router.url.includes('/dashboard')"
+                >
+                  <mat-icon class="nav-icon">leaderboard</mat-icon> Dashboard
+                </a>
+                <div class="nav-link help-link" [matMenuTriggerFor]="helpMenu">
+                  <mat-icon class="nav-icon">help_outline</mat-icon> Help
+                  <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
+                </div>
+                <mat-menu #helpMenu="matMenu" class="help-menu">
+                  <button mat-menu-item routerLink="/about">
+                    <mat-icon>info</mat-icon> About
+                  </button>
+                  <button mat-menu-item routerLink="/support">
+                    <mat-icon>support_agent</mat-icon> Support
+                  </button>
+                  <button mat-menu-item routerLink="/faq">
+                    <mat-icon>help</mat-icon> FAQ
+                  </button>
+                  <button mat-menu-item routerLink="/contact">
+                    <mat-icon>mail</mat-icon> Contact Us
+                  </button>
+                </mat-menu>
+                <!-- Right side with user menu -->
+                <div class="left-gap flex items-center">
+                  @if (isAuthenticated()) {
+                  <button
+                    mat-button
+                    [matMenuTriggerFor]="userMenu"
+                    class="user-button"
+                  >
                     <div class="flex items-center">
                       <div class="user-avatar-circle">
                         {{ getUserInitial() }}
                       </div>
-                      <span class="text-[#666666] ml-1 mr-1">{{ currentUser?.username }}</span>
-                      <mat-icon class="text-[#666666] transform scale-75">arrow_drop_down</mat-icon>
+                      <span
+                        class="text-[#666666] ml-1 mr-1 max-[999px]:flex max-[1174px]:hidden"
+                        >{{ currentUser?.username }}</span
+                      >
+                      <mat-icon class="text-[#666666] transform scale-75"
+                        >arrow_drop_down</mat-icon
+                      >
                     </div>
                   </button>
                   <mat-menu #userMenu="matMenu" class="mt-2">
                     <div class="py-1">
                       <div class="px-4 py-2 border-b border-gray-200">
-                        <div class="font-medium text-gray-900">{{ currentUser?.username }}</div>
+                        <div class="font-medium text-gray-900">
+                          {{ currentUser?.username }}
+                        </div>
                       </div>
                       <a mat-menu-item routerLink="/profile" class="menu-item">
                         <mat-icon class="menu-icon">person</mat-icon>
                         <span>Profile</span>
                       </a>
-                      <a mat-menu-item routerLink="/dashboard" class="menu-item">
+                      <a
+                        mat-menu-item
+                        routerLink="/dashboard"
+                        class="menu-item"
+                      >
                         <mat-icon class="menu-icon">dashboard</mat-icon>
                         <span>Dashboard</span>
                       </a>
@@ -100,375 +156,391 @@ import { User } from './services/auth.service';
                         <span>Settings</span>
                       </a>
                       <mat-divider></mat-divider>
-                      <button mat-menu-item (click)="onLogout()" class="menu-item">
+                      <button
+                        mat-menu-item
+                        (click)="onLogout()"
+                        class="menu-item"
+                      >
                         <mat-icon class="menu-icon">exit_to_app</mat-icon>
                         <span>Sign out</span>
                       </button>
                     </div>
                   </mat-menu>
-                } @else {
+                  } @else {
                   <!-- Empty else block to maintain authentication check -->
-                }
-              </div>
+                  }
+                </div>
+              </nav>
             </div>
-          </mat-toolbar>
-        </div>
+          </div>
+        </mat-toolbar>
+      </div>
       }
 
       <router-outlet></router-outlet>
     </div>
   `,
-  styles: [`
-    :host {
-      display: block;
-      min-height: 100vh;
-    }
+  styles: [
+    `
+      :host {
+        display: block;
+        min-height: 100vh;
+      }
 
-    .mat-toolbar {
-  height: 72px;
-  padding: 0;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-}
+      .mat-toolbar {
+        height: max-content;
+        padding: 0;
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+      }
 
-@media (max-width: 768px) {
-  .mat-toolbar {
-    height: 60px;
-  }
-}
+      @media (max-width: 768px) {
+        .mat-toolbar {
+          height: 60px;
+        }
+      }
 
-@media (max-width: 640px) {
-  .mat-toolbar {
-    height: 56px;
-  }
-}
+      @media (max-width: 640px) {
+        .mat-toolbar {
+          height: 56px;
+        }
+      }
 
-    .logo-container {
-      margin-left: 24px;
-      margin-right: 48px;
-      padding: 8px;
-    }
+      .logo-container {
+        margin-left: 24px;
+        margin-right: 48px;
+        padding: 8px;
+      }
 
-    .logo-link {
-      display: flex;
-      align-items: center;
-      padding: 12px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
+      .logo-link {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
 
-    .logo-link:hover {
-      transform: scale(1.1);
-      background-color: rgba(0, 13, 161, 0.5);
-    }
+      .logo-link:hover {
+        transform: scale(1.1);
+        background-color: rgba(0, 13, 161, 0.5);
+      }
 
-    .hex-logo-only {
-  height: 80px;
-  width: auto;
-  max-width: 220px;
-  display: block;
-  transition: filter 0.3s;
-  object-fit: contain;
-  vertical-align: middle;
-}
+      .hex-logo-only {
+        height: 80px;
+        width: auto;
+        max-width: 220px;
+        display: block;
+        transition: filter 0.3s;
+        object-fit: contain;
+        vertical-align: middle;
+      }
 
-.logo-link:hover .hex-logo-only {
-  filter: brightness(1.15) drop-shadow(0 0 8pxrgba(0, 51, 161, 0.45));
-}
+      .logo-link:hover .hex-logo-only {
+        filter: brightness(1.15) drop-shadow(0 0 8pxrgba (0, 51, 161, 0.45));
+      }
 
-@media (max-width: 1024px) {
-  .hex-logo-only {
-    height: 60px;
-    max-width: 180px;
-  }
-  
-  .logo-container {
-    margin-left: 16px;
-    margin-right: 24px;
-  }
-}
+      @media (max-width: 1024px) {
+        .hex-logo-only {
+          height: 60px;
+          max-width: 180px;
+        }
 
-@media (max-width: 768px) {
-  .hex-logo-only {
-    height: 50px;
-    max-width: 150px;
-  }
-  
-  .logo-container {
-    margin-left: 12px;
-    margin-right: 16px;
-  }
-  
-  .main-nav {
-    gap: 4px;
-    margin-left: 16px;
-  }
-  
-  .nav-link {
-    padding: 6px 12px;
-    font-size: 14px;
-  }
-  
-  .nav-link .nav-icon {
-    font-size: 16px;
-  }
-}
+        .logo-container {
+          margin-left: 16px;
+          margin-right: 24px;
+        }
+      }
 
-@media (max-width: 640px) {
-  .hex-logo-only {
-    height: 40px;
-    max-width: 120px;
-  }
-  
-  .logo-container {
-    margin-left: 8px;
-    margin-right: 12px;
-  }
-  
-  .main-nav {
-    gap: 2px;
-    margin-left: 8px;
-  }
-  
-  .nav-link {
-    padding: 4px 8px;
-    font-size: 12px;
-  }
-  
-  .nav-link .nav-icon {
-    font-size: 14px;
-    margin-right: 1px;
-  }
-}
+      @media (max-width: 768px) {
+        .hex-logo-only {
+          height: 50px;
+          max-width: 150px;
+        }
 
+        .logo-container {
+          margin-left: 12px;
+          margin-right: 16px;
+        }
 
-    .main-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 32px;
-}
+        .main-nav {
+          gap: 4px;
+          margin-left: 16px;
+        }
 
-.mobile-nav-toggle {
-  display: none;
-  margin-left: 14px;
-  background: none;
-  border: none;
-  color: #16213E;
-  z-index: 20;
-}
+        .nav-link {
+          padding: 6px 12px;
+          font-size: 14px;
+        }
 
-@media (max-width: 768px) {
-  .main-nav {
-    position: absolute;
-    top: 72px;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    align-items: flex-start;
-    background: #fff;
-    box-shadow: 0 8px 32px #0033a111;
-    padding: 18px 16px 12px 16px;
-    gap: 0;
-    margin-left: 0;
-    display: none;
-    border-bottom-left-radius: 18px;
-    border-bottom-right-radius: 18px;
-    min-width: 220px;
-    z-index: 19;
-  }
-  .main-nav.mobile-open {
-    display: flex;
-  }
-  .main-nav .nav-link {
-    width: 100%;
-    justify-content: flex-start;
-    margin: 0 0 8px 0;
-    border-radius: 8px;
-    font-size: 15px;
-    padding: 10px 18px;
-  }
-  .mobile-nav-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 21;
-    margin-left: 10px;
-  }
-}
+        .nav-link .nav-icon {
+          font-size: 16px;
+        }
+      }
 
+      @media (max-width: 640px) {
+        .hex-logo-only {
+          height: 40px;
+          max-width: 120px;
+        }
 
-.nav-link {
-  position: relative;
-  padding: 8px 18px;
-  color: #222b45;
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.18s cubic-bezier(.4,0,.2,1);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: transparent;
-  cursor: pointer;
-}
+        .logo-container {
+          margin-left: 8px;
+          margin-right: 12px;
+        }
 
-.nav-link .nav-icon {
-  font-size: 19px;
-  margin-right: 2px;
-  color: inherit;
-}
+        .main-nav {
+          gap: 2px;
+          margin-left: 8px;
+        }
 
-.nav-link:hover,
-.nav-link.active {
-  color: #fff;
-  background: #16213E;
-  border-radius: 999px;
-  box-shadow: 0 4px 18px 0 #16213e44, 0 0 0 2px #16213ecc;
-  text-shadow: 0 0 8px #16213ecc;
-}
+        .nav-link {
+          padding: 4px 8px;
+          font-size: 12px;
+        }
 
-.help-link {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-}
+        .nav-link .nav-icon {
+          font-size: 14px;
+          margin-right: 1px;
+        }
+      }
+      .left-gap {
+        @media (min-width: 1100px) {
+          margin-left: 10%;
+        }
+      }
 
-.dropdown-arrow {
-  font-size: 20px;
-  margin-left: 2px;
-}
+      .main-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-left: 32px;
+        width: 100%;
+      }
 
-:host ::ng-deep .help-menu {
-  min-width: 220px;
-  border-radius: 14px !important;
-  box-shadow: 0 6px 32px 0 #0033a133,0 0 0 1px #0033a120;
-  background: #fff;
-  padding: 6px 0;
-}
+      .mobile-nav-toggle {
+        display: none;
+        margin-left: 14px;
+        background: none;
+        border: none;
+        color: #16213e;
+        z-index: 20;
+      }
 
-:host ::ng-deep .help-menu .mat-menu-item {
-  font-size: 15px;
-  color: #0033A1;
-  border-radius: 8px;
-  transition: background 0.16s;
-}
+      @media (max-width: 999px) {
+        .main-nav {
+          position: absolute;
+          top: 70px;
+          left: 0;
+          right: 0;
+          flex-direction: column;
+          align-items: flex-start;
+          background: #fff;
+          box-shadow: 0 8px 32px #0033a111;
+          padding: 18px 16px 12px 16px;
+          gap: 0;
+          margin-left: 0;
+          display: none;
+          border-bottom-left-radius: 18px;
+          border-bottom-right-radius: 18px;
+          min-width: 220px;
+          z-index: 19;
+        }
+        .main-nav.mobile-open {
+          display: flex;
+          box-sizing: border-box;
+        }
+        .main-nav .nav-link {
+          width: 100%;
+          justify-content: flex-start;
+          margin: 0 0 8px 0;
+          border-radius: 8px;
+          font-size: 15px;
+          padding: 10px 18px;
+          box-sizing: border-box;
+        }
+        .mobile-nav-toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          z-index: 21;
+          margin-left: 10px;
+        }
+      }
 
-:host ::ng-deep .help-menu .mat-menu-item:hover {
-  background: linear-gradient(90deg, #0033A1 0%, #0056D2 100%);
-  color: #fff;
-}
+      .nav-link {
+        position: relative;
+        padding: 6px 15px;
+        color: #222b45;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        cursor: pointer;
+      }
 
-:host ::ng-deep .help-menu .mat-icon {
-  margin-right: 16px;
-  font-size: 20px;
-  color: inherit;
-}
+      .nav-link .nav-icon {
+        font-size: 19px;
+        margin-right: 2px;
+        color: inherit;
+      }
 
+      .nav-link:hover,
+      .nav-link.active {
+        color: #fff;
+        background: #16213e;
+        border-radius: 999px;
+        box-shadow: 0 4px 18px 0 #16213e44, 0 0 0 2px #16213ecc;
+        text-shadow: 0 0 8px #16213ecc;
+      }
 
-    .nav-icon {
-      font-size: 18px;
-      margin-right: 4px;
-      color: inherit;
-      vertical-align: middle;
-    }
+      .help-link {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+      }
 
-    .nav-link-auth {
-      padding: 8px 16px;
-      color: #374151;
-      font-size: 14px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 200ms;
-      border-radius: 4px;
-    }
+      .dropdown-arrow {
+        font-size: 20px;
+        margin-left: 2px;
+      }
 
-    .nav-link-auth:hover {
-      color: #0033A1;
-      background-color: rgba(0, 51, 161, 0.04);
-    }
+      :host ::ng-deep .help-menu {
+        min-width: 220px;
+        border-radius: 14px !important;
+        box-shadow: 0 6px 32px 0 #0033a133, 0 0 0 1px #0033a120;
+        background: #fff;
+        padding: 6px 0;
+      }
 
-    .nav-link-auth-primary {
-      padding: 8px 16px;
-      color: white;
-      background-color: #0033A1;
-      font-size: 14px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 200ms;
-      border-radius: 4px;
-    }
+      :host ::ng-deep .help-menu .mat-menu-item {
+        font-size: 15px;
+        color: #0033a1;
+        border-radius: 8px;
+        transition: background 0.16s;
+      }
 
-    .nav-link-auth-primary:hover {
-      background-color: #002A87;
-    }
+      :host ::ng-deep .help-menu .mat-menu-item:hover {
+        background: linear-gradient(90deg, #0033a1 0%, #0056d2 100%);
+        color: #fff;
+      }
 
-    .user-button {
-      min-width: 0;
-      padding: 4px 8px;
-      height: 36px;
-      background: transparent;
-      border: none;
-      transition: background-color 200ms;
-      border-radius: 4px;
-    }
+      :host ::ng-deep .help-menu .mat-icon {
+        margin-right: 16px;
+        font-size: 20px;
+        color: inherit;
+      }
 
-    .user-button:hover {
-      background-color: rgba(0, 0, 0, 0.04);
-    }
+      .nav-icon {
+        font-size: 18px;
+        margin-right: 4px;
+        color: inherit;
+        vertical-align: middle;
+      }
 
-    .user-avatar-circle {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background-color: #0747A6;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 500;
-    }
+      .nav-link-auth {
+        padding: 8px 16px;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 200ms;
+        border-radius: 4px;
+      }
 
-    .user-name {
-      max-width: 120px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 14px;
-    }
+      .nav-link-auth:hover {
+        color: #0033a1;
+        background-color: rgba(0, 51, 161, 0.04);
+      }
 
-    .menu-item {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      height: 40px;
-      color: #333333;
-    }
+      .nav-link-auth-primary {
+        padding: 8px 16px;
+        color: white;
+        background-color: #0033a1;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 200ms;
+        border-radius: 4px;
+      }
 
-    .menu-icon {
-      margin-right: 12px;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-      color: #666666;
-    }
+      .nav-link-auth-primary:hover {
+        background-color: #002a87;
+      }
 
-    :host ::ng-deep .mat-mdc-menu-content {
-      padding: 8px 0;
-    }
+      .user-button {
+        min-width: 0;
+        padding: 4px 8px;
+        height: 36px;
+        background: transparent;
+        border: none;
+        transition: background-color 200ms;
+        border-radius: 4px;
+        @media (max-width: 999px) {
+          margin: 0 5px;
+        }
+      }
 
-    :host ::ng-deep .mat-mdc-menu-item {
-      min-height: 40px;
-    }
+      .user-button:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
 
-    :host ::ng-deep .mat-mdc-menu-item:hover {
-      background-color: #F8F9FA;
-    }
-  `]
+      .user-avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #0747a6;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .user-name {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 14px;
+      }
+
+      .menu-item {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        height: 40px;
+        color: #333333;
+      }
+
+      .menu-icon {
+        margin-right: 12px;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #666666;
+      }
+
+      :host ::ng-deep .mat-mdc-menu-content {
+        padding: 8px 0;
+      }
+
+      :host ::ng-deep .mat-mdc-menu-item {
+        min-height: 40px;
+      }
+
+      :host ::ng-deep .mat-mdc-menu-item:hover {
+        background-color: #f8f9fa;
+      }
+    `,
+  ],
 })
 export class AppComponent implements OnInit {
   isLandingPage = false;
@@ -487,20 +559,18 @@ export class AppComponent implements OnInit {
     this.isScrolled = window.scrollY > 0;
   }
 
-  constructor(
-    private authService: AuthService,
-    public router: Router
-  ) {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      this.isLandingPage = event.url === '/';
-      this.isProblemDetailPage = event.url.includes('/problems/') && !event.url.endsWith('/problems/');
-    });
+  constructor(private authService: AuthService, public router: Router) {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.isLandingPage = event.url === '/';
+        this.isProblemDetailPage =
+          event.url.includes('/problems/') && !event.url.endsWith('/problems/');
+      });
   }
 
   ngOnInit() {
-    this.authService.getCurrentUser().subscribe(user => {
+    this.authService.getCurrentUser().subscribe((user) => {
       this.currentUser = user;
     });
   }
@@ -512,19 +582,25 @@ export class AppComponent implements OnInit {
   getUserInitial(): string {
     // If we have a full name, use the first letter of first and last names
     if (this.currentUser?.fullName) {
-      const nameParts = this.currentUser.fullName.split(' ').filter(part => part.trim().length > 0);
+      const nameParts = this.currentUser.fullName
+        .split(' ')
+        .filter((part) => part.trim().length > 0);
       if (nameParts.length === 0) return '';
       if (nameParts.length === 1) return nameParts[0][0].toUpperCase();
-      return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+      return (
+        nameParts[0][0] + nameParts[nameParts.length - 1][0]
+      ).toUpperCase();
     }
-    
+
     // Fall back to username if no full name
     if (this.currentUser?.username) {
       const username = this.currentUser.username;
       if (username.length === 1) return username.toUpperCase();
-      return (username.charAt(0) + username.charAt(username.length - 1)).toUpperCase();
+      return (
+        username.charAt(0) + username.charAt(username.length - 1)
+      ).toUpperCase();
     }
-    
+
     return '';
   }
 
