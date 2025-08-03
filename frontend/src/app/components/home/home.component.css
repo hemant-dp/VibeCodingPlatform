@@ -1,0 +1,43 @@
+/* Additional styles for animations and transitions */
+h1 {
+  animation: fadeInDown 0.8s ease-out;
+}
+
+p {
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.mt-12 {
+  animation: fadeIn 1s ease-out 0.4s both;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+} 
