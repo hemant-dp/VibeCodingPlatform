@@ -37,7 +37,13 @@ import { User } from './services/auth.service';
                 </div>
 
                 <!-- Primary Navigation -->
-                <nav class="main-nav">
+                <!-- Hamburger menu toggle for mobile -->
+<button mat-icon-button class="mobile-nav-toggle" (click)="toggleNav()" aria-label="Toggle navigation">
+  <mat-icon>{{ showMobileNav ? 'close' : 'menu' }}</mat-icon>
+</button>
+
+<!-- Desktop nav -->
+<nav class="main-nav" [ngClass]="{ 'mobile-open': showMobileNav }">
   <a routerLink="/" class="nav-link" [class.active]="router.url === '/'">
     <mat-icon class="nav-icon">home</mat-icon> Home
   </a>
@@ -49,8 +55,7 @@ import { User } from './services/auth.service';
   </a>
   <a routerLink="/dashboard" class="nav-link" [class.active]="router.url.includes('/dashboard')">
     <mat-icon class="nav-icon">leaderboard</mat-icon> Dashboard
-     </a>
-     
+  </a>
   <div class="nav-link help-link" [matMenuTriggerFor]="helpMenu">
     <mat-icon class="nav-icon">help_outline</mat-icon> Help
     <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
@@ -244,6 +249,56 @@ import { User } from './services/auth.service';
   margin-left: 32px;
 }
 
+.mobile-nav-toggle {
+  display: none;
+  margin-left: 14px;
+  background: none;
+  border: none;
+  color: #16213E;
+  z-index: 20;
+}
+
+@media (max-width: 768px) {
+  .main-nav {
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #fff;
+    box-shadow: 0 8px 32px #0033a111;
+    padding: 18px 16px 12px 16px;
+    gap: 0;
+    margin-left: 0;
+    display: none;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    min-width: 220px;
+    z-index: 19;
+  }
+  .main-nav.mobile-open {
+    display: flex;
+  }
+  .main-nav .nav-link {
+    width: 100%;
+    justify-content: flex-start;
+    margin: 0 0 8px 0;
+    border-radius: 8px;
+    font-size: 15px;
+    padding: 10px 18px;
+  }
+  .mobile-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 21;
+    margin-left: 10px;
+  }
+}
+
+
 .nav-link {
   position: relative;
   padding: 8px 18px;
@@ -420,6 +475,12 @@ export class AppComponent implements OnInit {
   isProblemDetailPage = false;
   isScrolled = false;
   currentUser: User | null = null;
+
+  showMobileNav = false;
+
+  toggleNav() {
+    this.showMobileNav = !this.showMobileNav;
+  }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
