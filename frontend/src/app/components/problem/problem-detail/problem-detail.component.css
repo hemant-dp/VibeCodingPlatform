@@ -54,11 +54,15 @@ textarea {
 
 /* Line Numbers */
 .line-numbers {
-  min-width: 3.5rem;
+  width: 4rem;
+  max-width: 4rem;
+  min-width: 4rem;
+  flex-shrink: 0;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
   font-size: 14px;
   background-color: #F8FAFC;
   border-right: 1px solid #E2E8F0;
+  overflow: hidden;
 }
 
 .line-numbers div {
@@ -66,6 +70,10 @@ textarea {
   line-height: 24px;
   color: #64748B;
   user-select: none;
+  padding-right: 0.5rem;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .line-numbers div:hover {
@@ -77,11 +85,6 @@ textarea {
   position: relative;
   height: 100%;
   background-color: white;
-}
-
-/* Code Editor Area */
-.h-\[500px\] {
-  margin-right: 5rem;
 }
 
 /* Toolbar select field */

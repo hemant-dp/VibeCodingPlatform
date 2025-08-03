@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatOptionModule } from '@angular/material/core';
+import { interval, Subscription } from 'rxjs';
+import { takeWhile, switchMap } from 'rxjs/operators';
 
 import { ProblemService, Problem } from '../../../services/problem.service';
 import { ExecutionService, ExecutionResult } from '../../../services/execution.service';
@@ -49,7 +51,7 @@ interface Example {
     SubmissionService
   ]
 })
-export class ProblemDetailComponent implements OnInit {
+export class ProblemDetailComponent implements OnInit, OnDestroy {
   problem: Problem | null = null;
   examples: Example[] = [];
   loading = true;
@@ -60,7 +62,10 @@ export class ProblemDetailComponent implements OnInit {
   lineCount = 5;
   isRunning = false;
   executionResult: ExecutionResult | null = null;
+  submissionError: string | null = null;
+  submissionResult: any = null;
   private currentProblemId: number = 0;
+  private pollingSubscription: Subscription | null = null;
 
   getLineNumbers(): number[] {
     const lines = this.code.split('\n').length;
@@ -205,6 +210,9 @@ public:
 
     this.isRunning = true;
     this.executionResult = null;
+    this.submissionError = null;
+    this.submissionResult = null;
+    this.stopPolling(); // Stop any existing polling
 
     // Map frontend language names to backend enum values
     const languageMapping: { [key: string]: string } = {
@@ -225,8 +233,27 @@ public:
     this.submissionService.submit(submissionRequest).subscribe({
       next: (submission) => {
         console.log('Submission successful:', submission);
+        this.submissionResult = submission;
         
-        if (submission && submission.id) {
+        // Check for immediate errors or start polling for status updates
+        if (submission && this.hasSubmissionError(submission)) {
+          const errorMessage = this.getSubmissionErrorMessage(submission);
+          this.submissionError = errorMessage;
+          
+          this.executionResult = {
+            status: 'ERROR',
+            error: errorMessage
+          };
+          this.isRunning = false;
+        } else if (submission && submission.id) {
+          // Start polling if submission is pending/running
+          if (['PENDING', 'COMPILING', 'RUNNING'].includes(submission.status)) {
+            this.startPollingSubmissionStatus(submission.id);
+          } else {
+            // Final status already received
+            this.handleFinalSubmissionStatus(submission);
+          }
+          
           this.executionResult = {
             status: 'SUCCESS',
             output: `Submission successful! 
@@ -242,8 +269,8 @@ Your solution has been submitted and is being judged. You can view the results i
             status: 'SUCCESS',
             output: 'Submission successful! Your solution has been submitted and is being judged.'
           };
+          this.isRunning = false;
         }
-        this.isRunning = false;
       },
       error: (err) => {
         console.error('Submission failed:', err);
@@ -338,5 +365,115 @@ Your solution has been submitted and is being judged. You can view the results i
     }
     
     return 'Can you solve this with better time or space complexity?';
+  }
+
+  // Helper methods for submission error handling
+  hasSubmissionError(submission: any): boolean {
+    const errorStatuses = ['RUNTIME_ERROR', 'COMPILATION_ERROR', 'JUDGE_ERROR', 'WRONG_ANSWER'];
+    return errorStatuses.includes(submission.status) || 
+           (submission.judgeOutput && submission.judgeOutput.includes('error')) ||
+           (submission.compileOutput && submission.compileOutput.includes('error'));
+  }
+
+  getSubmissionErrorMessage(submission: any): string {
+    // Priority: compile errors first, then judge output errors, then generic status errors
+    if (submission.status === 'COMPILATION_ERROR' && submission.compileOutput) {
+      return `Compilation Error: ${submission.compileOutput}`;
+    }
+    
+    if (submission.judgeOutput && submission.judgeOutput.includes('error')) {
+      return `Runtime Error: ${submission.judgeOutput}`;
+    }
+    
+    if (submission.status === 'RUNTIME_ERROR') {
+      return submission.judgeOutput || 'Runtime error occurred during code execution.';
+    }
+    
+    if (submission.status === 'WRONG_ANSWER') {
+      return 'Wrong Answer: Your solution produces incorrect output for some test cases.';
+    }
+    
+    if (submission.status === 'JUDGE_ERROR') {
+      return 'Judge Error: An internal error occurred while judging your submission. Please try again.';
+    }
+    
+    return `Submission failed with status: ${submission.status}`;
+  }
+
+  startPollingSubmissionStatus(submissionId: number) {
+    // Poll every 2 seconds for up to 30 seconds (15 attempts)
+    let pollCount = 0;
+    const maxPolls = 15;
+    
+    this.pollingSubscription = interval(2000).pipe(
+      takeWhile(() => pollCount < maxPolls),
+      switchMap(() => {
+        pollCount++;
+        return this.submissionService.getSubmission(submissionId);
+      })
+    ).subscribe({
+      next: (updatedSubmission) => {
+        console.log('Polling submission status:', updatedSubmission);
+        
+        // Check if submission has completed (any final status)
+        const finalStatuses = ['ACCEPTED', 'WRONG_ANSWER', 'RUNTIME_ERROR', 'COMPILATION_ERROR', 'TIME_LIMIT_EXCEEDED', 'MEMORY_LIMIT_EXCEEDED', 'JUDGE_ERROR'];
+        
+        if (finalStatuses.includes(updatedSubmission.status)) {
+          this.handleFinalSubmissionStatus(updatedSubmission);
+          this.stopPolling();
+        }
+      },
+      error: (err) => {
+        console.error('Error polling submission status:', err);
+        this.stopPolling();
+      },
+      complete: () => {
+        console.log('Polling completed');
+        this.isRunning = false;
+      }
+    });
+  }
+
+  handleFinalSubmissionStatus(submission: any) {
+    this.submissionResult = submission;
+    this.isRunning = false;
+    
+    // Check for errors and display them
+    if (this.hasSubmissionError(submission)) {
+      const errorMessage = this.getSubmissionErrorMessage(submission);
+      this.submissionError = errorMessage;
+      
+      this.executionResult = {
+        status: 'ERROR',
+        error: `Submission completed with errors:\n${errorMessage}`
+      };
+    } else if (submission.status === 'ACCEPTED') {
+      this.submissionError = null;
+      this.executionResult = {
+        status: 'SUCCESS',
+        output: `🎉 Accepted! 
+Your solution passed all test cases.
+Execution Time: ${submission.executionTimeMs || 'N/A'}ms
+Memory Used: ${submission.memoryUsedKb || 'N/A'}KB`
+      };
+    } else {
+      // Handle other final statuses
+      this.submissionError = null;
+      this.executionResult = {
+        status: 'INFO',
+        output: `Submission completed with status: ${submission.status}`
+      };
+    }
+  }
+
+  stopPolling() {
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+      this.pollingSubscription = null;
+    }
+  }
+
+  ngOnDestroy() {
+    this.stopPolling();
   }
 } 
