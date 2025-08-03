@@ -54,6 +54,16 @@ public class SubmissionController {
     public ResponseEntity<SubmissionResponse> submit(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody SubmissionRequest request) {
+        
+        // Temporary fix for disabled authentication - create a default user
+        if (user == null) {
+            user = User.builder()
+                .id(1L)
+                .username("anonymous")
+                .email("anonymous@example.com")
+                .build();
+        }
+        
         return ResponseEntity.ok(submissionService.submit(user, request));
     }
 } 

@@ -160,7 +160,9 @@ public class SubmissionService {
             Submission submission = createSubmission(user, problem, request);
             submission = submissionRepository.save(submission);
             
-            // Trigger async judging
+            // Trigger async judging - pass the submission entity directly
+            // but ensure we flush the transaction first
+            submissionRepository.flush();
             processSubmissionAsync(submission);
             
             return convertToResponse(submission);
@@ -182,18 +184,22 @@ public class SubmissionService {
             judgeService.judge(submission);
         } catch (Exception e) {
             log.error("Judge service error for submission: {}", submission.getId(), e);
-            handleJudgeError(submission);
+            handleJudgeError(submission.getId());
         }
     }
 
-    private void handleJudgeError(Submission submission) {
+    private void handleJudgeError(Long submissionId) {
         try {
-            submission.setStatus(Submission.Status.JUDGE_ERROR);
-            submission.setJudgeOutput("Internal judge service error occurred");
-            submissionRepository.save(submission);
+            Submission submission = submissionRepository.findById(submissionId)
+                .orElse(null);
+            if (submission != null) {
+                submission.setStatus(Submission.Status.JUDGE_ERROR);
+                submission.setJudgeOutput("Internal judge service error occurred");
+                submissionRepository.save(submission);
+            }
         } catch (Exception e) {
             log.error("Failed to update submission status after judge error: {}", 
-                submission.getId(), e);
+                submissionId, e);
         }
     }
 

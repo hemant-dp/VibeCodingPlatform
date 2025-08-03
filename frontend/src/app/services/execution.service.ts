@@ -22,7 +22,7 @@ export class ExecutionService {
   constructor(private http: HttpClient) {}
 
   executeCode(problemId: number, code: string, language: string): Observable<ExecutionResult> {
-    const url = `${this.apiUrl}/api/execute`;
+    const url = `${this.apiUrl}/execute`;
     const body = {
       problemId: problemId,
       code: code,
