@@ -23,29 +23,38 @@
       <!-- Content -->
       <mat-card-content *ngIf="!loading && !error">
         <div *ngIf="recentProblems.length > 0" class="space-y-4 p-4">
-          <div *ngFor="let problem of recentProblems" 
-               class="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-               [routerLink]="['/problems', problem.id]">
+          <div
+            *ngFor="let problem of recentProblems"
+            class="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            [routerLink]="['/problems', problem.id]"
+          >
             <div class="flex justify-between items-start">
               <div>
-                <h3 class="font-medium text-lg">{{problem.title}}</h3>
+                <h3 class="font-medium text-lg">{{ problem.title }}</h3>
                 <div class="flex flex-wrap gap-2 mt-2">
-                  <span *ngFor="let topic of problem.topics" 
-                        class="px-2 py-1 bg-gray-100 rounded-full text-sm">
-                    {{topic}}
+                  <span
+                    *ngFor="let topic of problem.topics"
+                    class="px-2 py-1 bg-gray-100 rounded-full text-sm"
+                  >
+                    {{ topic }}
                   </span>
                 </div>
               </div>
-              <span [class]="getDifficultyColor(problem.difficulty)"
-                    class="px-3 py-1 rounded-full text-sm font-medium">
-                {{problem.difficulty}}
+              <span
+                [class]="getDifficultyColor(problem.difficulty)"
+                class="px-3 py-1 rounded-full text-sm font-medium"
+              >
+                {{ problem.difficulty }}
               </span>
             </div>
           </div>
         </div>
 
         <!-- Empty State -->
-        <div *ngIf="!loading && recentProblems.length === 0" class="p-8 text-center">
+        <div
+          *ngIf="!loading && recentProblems.length === 0"
+          class="p-8 text-center"
+        >
           <mat-icon class="text-gray-400 text-4xl mb-2">assignment</mat-icon>
           <p class="text-gray-600">No recent problems available</p>
         </div>
@@ -68,7 +77,12 @@
         <div class="p-8 text-center text-gray-600">
           <mat-icon class="text-gray-400 text-4xl mb-2">code</mat-icon>
           <p>Start solving problems to see your submissions here</p>
-          <button mat-raised-button color="primary" class="mt-4" routerLink="/problems">
+          <button
+            mat-raised-button
+            color="primary"
+            class="mt-4"
+            routerLink="/problems"
+          >
             Practice Now
           </button>
         </div>
@@ -81,4 +95,4 @@
       </mat-card-actions>
     </mat-card>
   </div>
-</div> 
+</div>
