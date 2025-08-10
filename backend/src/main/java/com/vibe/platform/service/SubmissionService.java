@@ -92,6 +92,33 @@ public class SubmissionService {
     }
 
     /**
+     * Get recent submissions for a specific user with pagination
+     * @param userId User ID
+     * @param limit Number of submissions to return (max 100)
+     * @return List of recent submission responses for the user
+     */
+    @Transactional(readOnly = true)
+    public List<SubmissionResponse> getRecentSubmissionsForUser(Long userId, int limit) {
+        try {
+            validateLimit(limit);
+            List<Submission> submissions = submissionRepository.findByUserId(userId);
+            return submissions.stream()
+                .sorted((s1, s2) -> s2.getSubmittedAt().compareTo(s1.getSubmittedAt()))
+                .limit(limit)
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error fetching recent submissions for userId: {} with limit: {}", userId, limit, e);
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Failed to retrieve recent submissions for user"
+            );
+        }
+    }
+
+    /**
      * Get a specific submission by ID
      * @param id Submission ID
      * @return Submission response

@@ -66,4 +66,12 @@ public class SubmissionController {
         
         return ResponseEntity.ok(submissionService.submit(user, request));
     }
-} 
+
+    @GetMapping("/user/{userId}/recent")
+    @Operation(summary = "Get recent submissions for a user", description = "Retrieves the most recent submissions for a specific user")
+    public ResponseEntity<List<SubmissionResponse>> getRecentSubmissionsForUser(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "5") int limit) {
+        return ResponseEntity.ok(submissionService.getRecentSubmissionsForUser(userId, limit));
+    }
+}

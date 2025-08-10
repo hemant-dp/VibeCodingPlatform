@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-// import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
 export interface UserProfile {
@@ -40,4 +40,14 @@ export class UserService {
     }
     return response;
   }
-} 
+
+  // Fetch all problems
+  getAllProblems() {
+    return this.http.get<any[]>(`${environment.apiUrl}/problems`);
+  }
+
+  // Fetch recent submissions for a user
+  getRecentSubmissions(userId: number, limit: number = 5) {
+    return this.http.get<any[]>(`${environment.apiUrl}/submissions/user/${userId}/recent?limit=${limit}`);
+  }
+}

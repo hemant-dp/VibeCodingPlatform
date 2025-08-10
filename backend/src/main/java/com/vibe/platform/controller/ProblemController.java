@@ -122,4 +122,33 @@ public class ProblemController {
         problemService.deleteProblem(id);
         return ResponseEntity.noContent().build();
     }
-} 
+
+    @GetMapping("/user/{userId}/recent")
+    @Operation(summary = "Get recent problems for a user", description = "Retrieves the most recent problems attempted or solved by a specific user")
+    public ResponseEntity<List<ProblemListResponse>> getRecentProblemsForUser(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "5") int limit) {
+        // Get recent submissions for user
+        List<Submission> submissions = submissionRepository.findByUserId(userId);
+        // Sort by submittedAt descending, get unique problem IDs
+        List<Long> recentProblemIds = submissions.stream()
+            .sorted((s1, s2) -> s2.getSubmittedAt().compareTo(s1.getSubmittedAt()))
+            .map(s -> s.getProblem().getId())
+            .distinct()
+            .limit(limit)
+            .collect(Collectors.toList());
+        List<Problem> problems = problemRepository.findAllById(recentProblemIds);
+        // Preserve order of recentProblemIds
+        List<ProblemListResponse> response = recentProblemIds.stream()
+            .map(pid -> problems.stream().filter(p -> p.getId().equals(pid)).findFirst().orElse(null))
+            .filter(p -> p != null)
+            .map(problem -> ProblemListResponse.builder()
+                .id(problem.getId())
+                .title(problem.getTitle())
+                .difficulty(problem.getDifficulty())
+                .tags(problem.getTags())
+                .build())
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+}

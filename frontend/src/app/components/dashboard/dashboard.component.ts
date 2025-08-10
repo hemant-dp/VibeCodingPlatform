@@ -9,6 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { ActivityService, ActivityData, ActivitySummary } from '../../services/activity.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -130,9 +131,10 @@ import { ActivityService, ActivityData, ActivitySummary } from '../../services/a
 
               <!-- Problem Items -->
               <div class="space-y-4">
-                <div
-                  *ngFor="let i of [1, 2, 3]"
-                  class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                <a
+                  *ngFor="let problem of recentProblems"
+                  class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer no-underline"
+                  [routerLink]="['/problems', problem.id]"
                 >
                   <div class="flex items-center space-x-4">
                     <div
@@ -142,9 +144,9 @@ import { ActivityService, ActivityData, ActivitySummary } from '../../services/a
                     </div>
                     <div>
                       <h3 class="text-base font-medium text-gray-900">
-                        Two Sum
+                        {{ problem.title }}
                       </h3>
-                      <p class="text-sm text-gray-500">Arrays & Hashing</p>
+                      <p class="text-sm text-gray-500">{{ problem.tags?.join(', ') }}</p>
                     </div>
                   </div>
                   <div class="flex items-center space-x-4">
@@ -155,11 +157,14 @@ import { ActivityService, ActivityData, ActivitySummary } from '../../services/a
                     </div>
                     <button
                       class="text-[#0033A0] hover:text-[#0033A0]/80 transition-colors duration-200"
+                      [routerLink]="['/problems', problem.id]"
+                      (click)="$event.stopPropagation()"
+                      tabindex="-1"
                     >
                       <mat-icon>arrow_forward</mat-icon>
                     </button>
                   </div>
-                </div>
+                </a>
               </div>
             </div>
           </div>
@@ -254,7 +259,7 @@ import { ActivityService, ActivityData, ActivitySummary } from '../../services/a
               </h2>
               <div class="space-y-3">
                 <div
-                  *ngFor="let i of [1, 2, 3]"
+                  *ngFor="let submission of recentSubmissions"
                   class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg transition-colors duration-200"
                 >
                   <div
@@ -265,8 +270,8 @@ import { ActivityService, ActivityData, ActivitySummary } from '../../services/a
                     >
                   </div>
                   <div>
-                    <h4 class="text-sm font-medium text-gray-900">Two Sum</h4>
-                    <p class="text-xs text-gray-500">2 minutes ago</p>
+                    <h4 class="text-sm font-medium text-gray-900">{{ submission.problemTitle }}</h4>
+                    <p class="text-xs text-gray-500">{{ submission.status }} - {{ submission.language }}</p>
                   </div>
                 </div>
               </div>
@@ -390,6 +395,10 @@ import { ActivityService, ActivityData, ActivitySummary } from '../../services/a
 })
 export class DashboardComponent implements OnInit {
   // Calendar properties
+  recentProblems: any[] = [];
+  recentSubmissions: any[] = [];
+  userId: number = 1; // TODO: Replace with actual logged-in user id
+
   currentDate = new Date();
   selectedYear = this.currentDate.getFullYear();
   selectedMonth = this.currentDate.getMonth(); // 0-based (0 = January)
@@ -402,12 +411,20 @@ export class DashboardComponent implements OnInit {
   activitySummary: ActivitySummary | null = null;
   loading = false;
 
-  constructor(private activityService: ActivityService) {}
+  constructor(private activityService: ActivityService, private userService: UserService) {}
 
   ngOnInit() {
     this.initializeYears();
     this.loadActivitySummary();
     this.loadMonthlyActivity();
+    // Fetch all problems from backend
+    this.userService.getAllProblems().subscribe(data => {
+      this.recentProblems = data;
+    });
+    // Fetch recent submissions from backend
+    this.userService.getRecentSubmissions(this.userId).subscribe(data => {
+      this.recentSubmissions = data;
+    });
   }
 
   private initializeYears() {
